@@ -13,7 +13,7 @@ const ProductList = ({onAddToCart}) => {
   useEffect(() => {
     // Fetch products from backend
     axios
-    .get('http://localhost:5000/api/products/')
+    .get('https://onedreamscape-creation.onrender.com/products/')
       .then((res) =>{
         const allProducts=res.data;
         setProducts(allProducts);

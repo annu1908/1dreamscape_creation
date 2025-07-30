@@ -7,7 +7,10 @@ const productRoutes=require('./routes/productRoutes');
 const orderRoutes=require('./routes/orderRoutes');
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin:"https://1dreamscape-creation.vercel.app",
+    credentials:true
+}));
 app.use(express.json());
 app.use('/api/products',productRoutes);
 app.use('/api/orders',orderRoutes);
