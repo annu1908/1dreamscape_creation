@@ -12,7 +12,7 @@ import HeroSection from "./components/HeroSection";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import ThankYou from "./pages/ThankYou";
-
+import "./App.css"
 
 
 function App() {

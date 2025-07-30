@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = ({ cartCount }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,8 +27,10 @@ const Navbar = ({ cartCount }) => {
           🛒
           {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
         </Link>
+        <ThemeToggle/>
       </div>
       </div>
+      
     </nav>
   );
 };
