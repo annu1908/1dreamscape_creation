@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './CheckoutPage.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { loadRazorpay } from '../utils/checkoutHndler';
 
 const CheckoutPage = ({ cartItems, setCartItems }) => {
   const [showMessage,setShowMessage]=useState(false);
@@ -103,6 +104,7 @@ const navigate=useNavigate();
           required
         ></textarea>
         <button type="submit">Place Order</button>
+        <button onClick={()=>loadRazorpay()}></button>
       </form>
     </div>
   );
