@@ -2,10 +2,10 @@ import axios from 'axios';
 
 export const loadRazorpay = (amount) => {
   const options = {
-    key: 'rzp_test_soj7DcRXrQxl9G', // Replace with your Razorpay Test Key
-    amount: amount * 100, // amount in paisa
+    key: 'rzp_test_soj7DcRXrQxl9G', 
+    amount: amount * 100, 
     currency: 'INR',
-    name: 'ShilpSaaz',
+    name: 'Dreamscape Creation',
     description: 'Order Payment',
     image: '/logo.png',
     handler: function (response) {

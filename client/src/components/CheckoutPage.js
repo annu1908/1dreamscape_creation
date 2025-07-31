@@ -57,6 +57,48 @@ const navigate=useNavigate();
     }
   }
   };
+  const handlePayment = async () => {
+  const amount = total;
+
+  try {
+    const res = await fetch('http://localhost:5000/api/orders/create-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount }),
+    });
+
+    const orderData = await res.json();
+
+    const options = {
+      key: 'rzp_test_soj7DcRXrQxl9G', 
+      amount: orderData.amount,
+      currency: 'INR',
+      name: 'Dreamscape Creation',
+      description: 'Art & Craft Order Payment',
+      order_id: orderData.id,
+      handler: function (response) {
+        alert('✅ Payment successful! Payment ID: ' + response.razorpay_payment_id);
+        // Optionally redirect or call order save logic here
+      },
+      prefill: {
+        name: formData.name,
+        email: formData.email,
+        contact: '9999999999', // Optional static or dynamic
+      },
+      theme: {
+        color: '#F37254',
+      },
+    };
+
+    const razor = new window.Razorpay(options);
+    razor.open();
+  } catch (err) {
+    console.error('Payment failed:', err);
+    alert('❌ Payment could not be processed.');
+  }
+};
 
   return (
     <div className="checkout-container">
@@ -104,7 +146,7 @@ const navigate=useNavigate();
           required
         ></textarea>
         <button type="submit">Place Order</button>
-        <button onClick={()=>loadRazorpay()}></button>
+        <button type='button' onClick={handlePayment}>Proceed to Payment</button>
       </form>
     </div>
   );
