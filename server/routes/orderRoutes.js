@@ -3,8 +3,8 @@ const router = express.Router();
 const Order = require('../models/Order');
 const Razorpay=require('razorpay')
 const instance=new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_SECRET_KEY,
+  key_id: process.env.KEY_ID,
+  key_secret: process.env.SECRET_KEY,
 });
 
 // @route   POST /api/orders
