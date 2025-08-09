@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+
 import './Auth.css'; // Reuse signup styles
 import { useNavigate } from 'react-router-dom';
+import API from '../api';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const Login = () => {
     setMessage('');
 
     try {
-      const response = await axios.post('https://onedreamscape-creation.onrender.com/api/auth/login', formData);
+      const response = await API.post('/api/auth/login', formData);
 
       const { token, name, email } = response.data;
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+
 import ProductCard from './ProductCard';
 import './ProductList.css';
+import API from '../api';
 
 const ProductList = ({onAddToCart}) => {
   const [products, setProducts] = useState([]);
@@ -12,8 +13,7 @@ const ProductList = ({onAddToCart}) => {
 
   useEffect(() => {
     // Fetch products from backend
-    axios
-    .get('https://onedreamscape-creation.onrender.com/api/products/')
+    API.get('/api/products/')
       .then((res) =>{
         const allProducts=res.data;
         setProducts(allProducts);

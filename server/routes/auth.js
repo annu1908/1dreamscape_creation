@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 require('dotenv').config();
 
-// Register User
+
 router.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -22,11 +22,6 @@ router.post('/signup', async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      phone,
-      address,
-      city,
-      pincode,
-      country,
     });
 
     await newUser.save();

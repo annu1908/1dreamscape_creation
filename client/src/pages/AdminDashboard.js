@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css'; // create CSS file if needed
+import API from '../api';
 
 const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
@@ -20,7 +20,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get('https://onedreamscape-creation.onrender.com/api/orders'); // adjust URL if needed
+        const res = await API.get('/api/orders'); // adjust URL if needed
         setOrders(res.data);
       } catch (err) {
         console.error('Failed to fetch orders:', err);

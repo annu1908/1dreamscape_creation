@@ -11,12 +11,15 @@ const app = express();
 
 app.use(cors(
     {
-        origin:"https://1dreamscape-creation.vercel.app",
+        origin:["https://1dreamscape-creation.vercel.app",
+           "http://localhost:3000"],
+
         methods:["GET","POST","PUT","DELETE"],
         credentials:true
     }
 ));
 app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 app.use('/api/products',productRoutes);
 app.use('/api/orders',orderRoutes);
 app.use('/api/payment',razorpayRoutes);

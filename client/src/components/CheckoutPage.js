@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './CheckoutPage.css';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import API from '../api';
 
 const CheckoutPage = ({ cartItems, setCartItems }) => {
   const [showMessage, setShowMessage] = useState(false);
@@ -18,8 +18,6 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-
-      // Autofill user info if available
       setFormData((prev) => ({
         ...prev,
         name: parsedUser.name || '',
@@ -39,16 +37,9 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
       return;
     }
 
-    const amount = total;
-
     try {
-      const res = await fetch('https://onedreamscape-creation.onrender.com/api/payment/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount }),
-      });
-
-      const orderData = await res.json();
+      // ✅ Correct Axios POST request
+      const { data: orderData } = await API.post('/api/payment/create-order', { amount: total });
 
       const options = {
         key: 'rzp_test_soj7DcRXrQxl9G',
@@ -66,14 +57,14 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
             subtotal,
             deliveryCharge,
             total,
-            userId: user._id, // include logged-in user id
+            userId: user._id,
             paymentId: response.razorpay_payment_id,
             razorpayOrderId: response.razorpay_order_id,
             razorpaySignature: response.razorpay_signature,
           };
 
           try {
-            const saveRes = await axios.post('https://onedreamscape-creation.onrender.com/api/orders', orderDetails);
+            const saveRes = await API.post('/api/orders', orderDetails);
             setCartItems([]);
             localStorage.removeItem('cartItems');
             navigate('/ThankYou', { state: { orderId: saveRes.data.orderId } });
@@ -145,7 +136,7 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
           required
         ></textarea>
 
-        <button type="button"  onClick={handlePayment}>
+        <button type="button" onClick={handlePayment}>
           Proceed to Payment
         </button>
       </form>

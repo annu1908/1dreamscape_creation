@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import './ProductDetails.css'; 
 import { toast } from 'react-toastify';
 import { useFavorites } from '../context/FavoritesContext'; // ⬅️ Import context
+import API from '../api';
 
 const ProductDetails = ({ onAddToCart }) => {
   const { id } = useParams();
@@ -11,9 +12,9 @@ const ProductDetails = ({ onAddToCart }) => {
 
   useEffect(() => {
     // Fetch product by ID
-    fetch(`http://localhost:5000/api/products/${id}`)
-      .then(res => res.json())
-      .then(data => setProduct(data))
+    API.get(`/api/products/${id}`)
+      .then(res => setProduct(res.data))
+      //.then(data => setProduct(data))
       .catch(err => console.error('Error fetching product:', err));
   }, [id]);
 
