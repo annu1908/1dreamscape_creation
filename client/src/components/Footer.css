@@ -1,0 +1,23 @@
+.footer {
+  background:  #212135;
+  padding: 20px;
+  text-align: center;
+  color: #ddd;
+  margin-top: 30px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.footer-links {
+  margin-top: 10px;
+}
+
+.footer-links a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #d86b94;
+  font-weight: bold;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}

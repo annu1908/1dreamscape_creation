@@ -1,0 +1,36 @@
+.product-list{
+    padding:20px;
+}
+
+
+.grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(220px, 1fr));
+    gap: 20px;
+    padding-top:20px;
+}
+
+
+.filter-buttons{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.filter-buttons button{
+    padding: 8px 16px;
+    border:none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+.filter-buttons button:hover{
+    background-color: #ddd;
+}
+.filter-buttons .active{
+    background-color: #333;
+    color:white;
+}

@@ -1,0 +1,11 @@
+.admin-dashboard{
+    padding: 2rem;
+    background: #f9f9f9;
+}
+.order-card{
+    background:white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}

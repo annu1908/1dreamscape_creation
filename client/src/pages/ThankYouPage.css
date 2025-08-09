@@ -1,0 +1,45 @@
+.home-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #c94f7c;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.home-btn:hover {
+  background-color: #a93d64;
+}
+.thankyou-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  background-color: #f9f4f7; /* light background */
+  padding: 20px;
+}
+
+.thankyou-box {
+  background-color: #fff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  border: 2px solid #eec1d1;
+}
+
+.thankyou-box h2 {
+  color: #c94f7c;
+  margin-bottom: 10px;
+}
+
+.thankyou-box p {
+  font-size: 16px;
+  color: #333;
+  margin: 8px 0;
+}
