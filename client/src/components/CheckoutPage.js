@@ -73,7 +73,7 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
           };
 
           try {
-            const saveRes = await axios.post('https://onedreamscape-creation.onrender.com/orders', orderDetails);
+            const saveRes = await axios.post('https://onedreamscape-creation.onrender.com/api/orders', orderDetails);
             setCartItems([]);
             localStorage.removeItem('cartItems');
             navigate('/ThankYou', { state: { orderId: saveRes.data.orderId } });
