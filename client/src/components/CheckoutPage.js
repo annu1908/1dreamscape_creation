@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import './CheckoutPage.css';
 import { useNavigate } from 'react-router-dom';
 import API from '../api';
+import { useCart } from '../context/CartContext';
 
-const CheckoutPage = ({ cartItems, setCartItems }) => {
-  const [showMessage, setShowMessage] = useState(false);
+const CheckoutPage = () => {
+  const { cartItems, clearCart } = useCart();
   const [formData, setFormData] = useState({ name: '', email: '', address: '' });
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -38,11 +39,10 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
     }
 
     try {
-      // ✅ Correct Axios POST request
-      const { data: orderData } = await API.post('/api/payment/create-order', { amount: total });
+      const { data: orderData } = await API.post('/api/orders/create-order', { amount: total });
 
       const options = {
-        key: 'rzp_test_soj7DcRXrQxl9G',
+        key: process.env.REACT_APP_RAZORPAY_KEY,
         amount: orderData.amount,
         currency: 'INR',
         name: 'Dreamscape Creation',
@@ -57,7 +57,6 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
             subtotal,
             deliveryCharge,
             total,
-            userId: user._id,
             paymentId: response.razorpay_payment_id,
             razorpayOrderId: response.razorpay_order_id,
             razorpaySignature: response.razorpay_signature,
@@ -65,9 +64,8 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
 
           try {
             const saveRes = await API.post('/api/orders', orderDetails);
-            setCartItems([]);
-            localStorage.removeItem('cartItems');
-            navigate('/ThankYou', { state: { orderId: saveRes.data.orderId } });
+            clearCart();
+            navigate('/thankyou', { state: { orderId: saveRes.data.orderId } });
           } catch (err) {
             alert('✅ Payment succeeded, but saving order failed.');
           }
@@ -104,12 +102,6 @@ const CheckoutPage = ({ cartItems, setCartItems }) => {
         <p>Delivery Charge: ₹{deliveryCharge}</p>
         <h4>Total: ₹{total}</h4>
       </div>
-
-      {showMessage && (
-        <div className='success-message'>
-          <p>Order Placed Successfully!</p>
-        </div>
-      )}
 
       <form className="checkout-form" onSubmit={(e) => e.preventDefault()}>
         <input

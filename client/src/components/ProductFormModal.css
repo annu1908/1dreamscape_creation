@@ -1,0 +1,149 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+}
+
+.product-form .form-group {
+  margin-bottom: 16px;
+}
+
+.product-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+}
+
+.product-form input[type="text"],
+.product-form input[type="number"],
+.product-form textarea,
+.product-form input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.product-form input[type="text"]:focus,
+.product-form input[type="number"]:focus,
+.product-form textarea:focus {
+  outline: none;
+  border-color: #d86b94;
+  box-shadow: 0 0 0 2px rgba(216, 107, 148, 0.2);
+}
+
+.current-image-preview {
+  margin-bottom: 10px;
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.current-image-preview p {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #777;
+}
+
+.current-image-preview img {
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.btn-cancel {
+  background: #f1f1f1;
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background: #e2e2e2;
+}
+
+.btn-submit {
+  background: #d86b94;
+  color: white;
+}
+
+.btn-submit:hover {
+  background: #c0557e;
+}
+
+/* Dark mode support */
+body.dark .modal-content {
+  background: #1e1e2e;
+  border: 1px solid #2d2d44;
+}
+
+body.dark .modal-content h2,
+body.dark .product-form label {
+  color: #eee;
+}
+
+body.dark .product-form input[type="text"],
+body.dark .product-form input[type="number"],
+body.dark .product-form textarea,
+body.dark .product-form input[type="file"] {
+  background: #2a2a3e;
+  border-color: #3d3d55;
+  color: #eee;
+}
+
+body.dark .current-image-preview {
+  background: #252538;
+}
+
+body.dark .btn-cancel {
+  background: #3d3d55;
+  color: #eee;
+}
+
+body.dark .btn-cancel:hover {
+  background: #4b4b6b;
+}

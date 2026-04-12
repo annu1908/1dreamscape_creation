@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import ThemeToggle from './ThemeToggle';
+import { useCart } from '../context/CartContext';
 
-const Navbar = ({ cartCount }) => {
+const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const { cartCount } = useCart();
 
   const token = localStorage.getItem('token');
   const userData = localStorage.getItem('user');
@@ -57,6 +59,8 @@ const Navbar = ({ cartCount }) => {
             </>
           ) : (
             <>
+              <Link to="/orders" className="nav-link" onClick={() => setMenuOpen(false)}>My Orders</Link>
+
               {/* Desktop initial + dropdown */}
               <div className="user-dropdown desktop-only">
                 <div className="user-initial-circle" onClick={toggleDropdown}>
@@ -64,7 +68,18 @@ const Navbar = ({ cartCount }) => {
                 </div>
                 {dropdownOpen && (
                   <div className="dropdown-menu">
-                    <div className="logout" onClick={handleLogout}>Logout</div>
+                    <div className="dropdown-header">
+                      <strong>{user.name}</strong>
+                      <span>{user.email}</span>
+                    </div>
+                    <div className="dropdown-divider"></div>
+                    <Link to="/profile" className="dropdown-item" onClick={() => setDropdownOpen(false)}>👤 My Profile</Link>
+                    <Link to="/orders" className="dropdown-item" onClick={() => setDropdownOpen(false)}>📦 My Orders</Link>
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className="dropdown-item" onClick={() => setDropdownOpen(false)}>⚙️ Admin Panel</Link>
+                    )}
+                    <div className="dropdown-divider"></div>
+                    <div className="dropdown-item dropdown-logout" onClick={handleLogout}>🚪 Sign Out</div>
                   </div>
                 )}
               </div>

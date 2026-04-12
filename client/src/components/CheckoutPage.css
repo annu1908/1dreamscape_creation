@@ -24,25 +24,67 @@
 
 .checkout-form input,
 .checkout-form textarea {
-  padding: 10px;
-  font-size: 16px;
+  padding: 12px;
+  font-size: 15px;
   width: 100%;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+  background: #fff;
+  color: #333;
+}
+
+.checkout-form input:focus,
+.checkout-form textarea:focus {
+  outline: none;
+  border-color: #d86b94;
 }
 
 .checkout-form button {
-  padding: 12px;
+  padding: 14px;
   background-color: #d86b94;
   color: #fff;
   font-weight: bold;
   border: none;
   cursor: pointer;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: background 0.3s ease;
 }
-.sucess-message{
+
+.checkout-form button:hover {
+  background-color: #c25a82;
+}
+
+.success-message {
   background-color: #e0ffe0;
   border: 1px solid #2ecc71;
-  padding:10px 15px;
-  margin-bottom:15px;
-  border-radius:5px;
-  color:#2e7d32;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  color: #2e7d32;
   font-weight: 500;
+}
+
+/* ===== Dark Mode ===== */
+body.dark .order-summary {
+  border-bottom-color: #2d2d44;
+}
+
+body.dark .checkout-form input,
+body.dark .checkout-form textarea {
+  background: #1e1e2e;
+  border-color: #3d3d55;
+  color: #eee;
+}
+
+body.dark .checkout-form input:focus,
+body.dark .checkout-form textarea:focus {
+  border-color: #d86b94;
+}
+
+body.dark .checkout-form input::placeholder,
+body.dark .checkout-form textarea::placeholder {
+  color: #777;
 }

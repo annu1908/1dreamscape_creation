@@ -17,6 +17,7 @@
   height: 100px;
   object-fit: cover;
   margin-right: 1rem;
+  border-radius: 8px;
 }
 
 .cart-details {
@@ -33,14 +34,30 @@
   width: 30px;
   height: 30px;
   font-size: 18px;
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.quantity-controls button:hover {
+  background: #e0e0e0;
 }
 
 .remove-btn {
   background-color: #ff4d4d;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 16px;
   color: white;
   cursor: pointer;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.remove-btn:hover {
+  background-color: #e03e3e;
 }
 
 .cart-summary {
@@ -50,9 +67,40 @@
 
 .checkout-btn {
   margin-top: 1rem;
-  padding: 10px 20px;
+  padding: 12px 24px;
   background-color: #212135;
   color: white;
   border: none;
   cursor: pointer;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.3s ease;
+}
+
+.checkout-btn:hover {
+  background-color: #d86b94;
+}
+
+/* ===== Dark Mode ===== */
+body.dark .cart-item {
+  border-bottom-color: #2d2d44;
+}
+
+body.dark .quantity-controls button {
+  background: #2a2a3e;
+  border-color: #3d3d55;
+  color: #eee;
+}
+
+body.dark .quantity-controls button:hover {
+  background: #3d3d55;
+}
+
+body.dark .checkout-btn {
+  background-color: #d86b94;
+}
+
+body.dark .checkout-btn:hover {
+  background-color: #c25a82;
 }

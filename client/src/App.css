@@ -1,28 +1,25 @@
 @import "~slick-carousel/slick/slick.css";
 @import "~slick-carousel/slick/slick-theme.css";
+
 /* Default Light Theme */
 body {
   background-color: #fff;
   color: #000;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Dark Mode */
 body.dark {
   background-color: #121212;
-  color: #fff;
+  color: #e0e0e0;
 }
 
-/* Optional customizations */
-
-.dark .card {
-  background-color: #1e1e1e;
-  color: #f5f5f5;
-}
-html, body,#root {
+html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
 }
+
 .app-wrapper {
   display: flex;
   flex-direction: column;

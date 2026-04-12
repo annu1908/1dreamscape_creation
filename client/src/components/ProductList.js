@@ -1,76 +1,120 @@
 import React, { useEffect, useState } from 'react';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import './ProductList.css';
 import API from '../api';
 
-const ProductList = ({onAddToCart}) => {
+const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-   const [filtered, setFiltered] = useState([]);
-    const [category, setCategory] = useState('all');
+  const [filtered, setFiltered] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Extract category from URL
+  const searchParams = new URLSearchParams(location.search);
+  const categoryParam = searchParams.get('category') || 'all';
+
+  // Load products once
   useEffect(() => {
-    // Fetch products from backend
     API.get('/api/products/')
-      .then((res) =>{
-        const allProducts=res.data;
-        setProducts(allProducts);
-       setFiltered(allProducts);
-        
+      .then((res) => {
+        setProducts(res.data);
         setLoading(false);
-        
-        
       })
-      .catch((err) =>{
-     setError('Failed to load products');
-     setLoading(false);
-  });
-},[]);
-if(loading)return<p>Loading Products...</p>;
-if(error)return<p style={{color:'red'}}>{error}</p>
-const handleFilter=(cat)=>{
+      .catch((err) => {
+        setError('Failed to load products');
+        setLoading(false);
+      });
+  }, []);
 
-  setCategory(cat);
-  if (cat==='all'){
-    setFiltered(products);
-  }else{
-    const filteredList=products.filter((p)=>
-      p.category?.toLowerCase().trim()===cat.toLowerCase().trim()
-  );
-    setFiltered(filteredList);
-  }
+  // Filter products whenever products, URL category, or search query changes
+  useEffect(() => {
+    if (products.length === 0) return;
+
+    let result = products;
+
+    // Category filter
+    if (categoryParam !== 'all') {
+      result = result.filter((p) =>
+        p.category?.toLowerCase().trim() === categoryParam.toLowerCase().trim()
+      );
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter((p) =>
+        p.title?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q)
+      );
+    }
+
+    setFiltered(result);
+  }, [products, categoryParam, searchQuery]);
+
+  const handleFilter = (cat) => {
+    if (cat === 'all') {
+      navigate('/');
+    } else {
+      navigate(`/?category=${cat}`);
+    }
   };
 
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  if (loading) return <div className="loading-spinner"><div className="spinner"></div><p>Loading Products...</p></div>;
+  if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
-    <div  id="product-section"className='product-list'>
+    <div id="product-section" className='product-list'>
       <h2>Our Products</h2>
-    <p>Total Products:{products?.length}</p>
-    <div className="filter-buttons">
-      <button onClick={()=>handleFilter('all')}className={category==='all'? 'active': ''}>All</button>
-      <button onClick={()=>handleFilter('resin')}className={category==='resin'? 'active': ''}>Resin</button>
-      <button onClick={()=>handleFilter('embroidery')}className={category==='embroidery'? 'active': ''}>Embroidery</button>
-      <button onClick={()=>handleFilter('sketch')}className={category==='sketch'? 'active': ''}>Sketch</button>
-      <button onClick={()=>handleFilter('crochet')}className={category==='crochet'? 'active': ''}>Crochet</button>
-    </div>
 
-      <div className="grid">  
-        {filtered.length>0?(
-          filtered.map((product)=>(<ProductCard key={product._id} product={product} onAddToCart={onAddToCart}/>
-
-          ))
-        ):(
-          <p style={{textAlign:'center'}}>No products found for "{category}</p>
-        
+      <div className="search-bar">
+        <span className="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Search products by name, description, or category..."
+          value={searchQuery}
+          onChange={handleSearch}
+        />
+        {searchQuery && (
+          <button className="search-clear" onClick={() => setSearchQuery('')}>
+            ✕
+          </button>
         )}
-        
-      
-          </div>
-    
       </div>
-    
+
+      <div className="filter-buttons">
+        <button onClick={() => handleFilter('all')} className={categoryParam === 'all' ? 'active' : ''}>All</button>
+        <button onClick={() => handleFilter('resin')} className={categoryParam === 'resin' ? 'active' : ''}>Resin</button>
+        <button onClick={() => handleFilter('embroidery')} className={categoryParam === 'embroidery' ? 'active' : ''}>Embroidery</button>
+        <button onClick={() => handleFilter('sketch')} className={categoryParam === 'sketch' ? 'active' : ''}>Sketch</button>
+        <button onClick={() => handleFilter('crochet')} className={categoryParam === 'crochet' ? 'active' : ''}>Crochet</button>
+      </div>
+
+      <div className="grid">
+        {filtered.length > 0 ? (
+          filtered.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))
+        ) : (
+          <div className="no-results">
+            <span className="no-results-icon">🔍</span>
+            <p>No products found {searchQuery ? `for "${searchQuery}"` : `in "${categoryParam}"`}</p>
+            <button onClick={() => { navigate('/'); setSearchQuery(''); }}>
+              View All Products
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

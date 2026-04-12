@@ -1,7 +1,17 @@
 .contact-container {
   max-width: 600px;
-  margin: 50px auto;
-  padding: 20px;
+  margin: 60px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: background 0.3s ease;
+}
+
+.contact-container h2 {
+  text-align: center;
+  color: #d86b94;
+  margin-bottom: 20px;
 }
 
 .contact-form {
@@ -16,22 +26,73 @@
 
 .contact-form input,
 .contact-form textarea {
-  padding: 10px;
+  padding: 12px;
   margin-top: 5px;
-  font-size: 16px;
+  font-size: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+  background: #fff;
+  color: #333;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: #d86b94;
 }
 
 .contact-form button {
   margin-top: 20px;
-  padding: 10px;
-  background-color:#d86b94;
+  padding: 12px;
+  background-color: #d86b94;
   color: #fff;
   border: none;
   cursor: pointer;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.3s ease;
+}
+
+.contact-form button:hover {
+  background-color: #c25a82;
 }
 
 .form-status {
   margin-top: 10px;
   color: green;
   font-weight: 500;
+  text-align: center;
+}
+
+/* ===== Dark Mode ===== */
+body.dark .contact-container {
+  background: #1e1e2e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .contact-container h2 {
+  color: #e899b6;
+}
+
+body.dark .contact-form input,
+body.dark .contact-form textarea {
+  background: #252540;
+  border-color: #3d3d55;
+  color: #eee;
+}
+
+body.dark .contact-form input:focus,
+body.dark .contact-form textarea:focus {
+  border-color: #d86b94;
+}
+
+body.dark .contact-form input::placeholder,
+body.dark .contact-form textarea::placeholder {
+  color: #777;
+}
+
+body.dark .contact-form label {
+  color: #ccc;
 }

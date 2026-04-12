@@ -1,11 +1,366 @@
-.admin-dashboard{
-    padding: 2rem;
-    background: #f9f9f9;
+.admin-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
 }
-.order-card{
-    background:white;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+
+.admin-header {
+  margin-bottom: 30px;
+}
+
+.admin-header h2 {
+  color: #333;
+  font-size: 28px;
+}
+
+/* Tabs */
+.admin-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #eaeaea;
+  padding-bottom: 10px;
+}
+
+.admin-tabs button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: 600;
+  color: #888;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.admin-tabs button:hover {
+  background: #f5f5f5;
+  color: #555;
+}
+
+.admin-tabs button.active {
+  background: #d86b94;
+  color: white;
+  box-shadow: 0 4px 12px rgba(216, 107, 148, 0.3);
+}
+
+/* Section Common */
+.admin-section h3 {
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  color: #666;
+  grid-column: 1 / -1;
+}
+
+/* Orders Grid */
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.admin-order-card {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.order-id {
+  font-weight: 700;
+  color: #555;
+  font-size: 13px;
+}
+
+.status-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dropdown {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  font-weight: 600;
+  background: #f9f9f9;
+  cursor: pointer;
+  outline: none;
+}
+
+.order-customer-info p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.order-total {
+  font-size: 16px !important;
+  color: #d86b94 !important;
+  margin-top: 10px !important;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+}
+
+.order-items-list {
+  margin-top: 15px;
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 8px;
+  flex-grow: 1;
+}
+
+.order-items-list ul {
+  padding-left: 20px;
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.order-items-list li {
+  margin-bottom: 4px;
+}
+
+.qty {
+  color: #888;
+  font-weight: 600;
+}
+
+/* Products Table */
+.btn-add {
+  background: #d86b94;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(216, 107, 148, 0.2);
+  transition: all 0.2s;
+}
+
+.btn-add:hover {
+  background: #c0557e;
+  transform: translateY(-2px);
+}
+
+.table-responsive {
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.products-table th, 
+.products-table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.products-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+}
+
+.products-table tbody tr:hover {
+  background-color: #fcfcfc;
+}
+
+.table-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.category-badge {
+  background: #e2e8f0;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.table-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit, 
+.btn-delete {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-edit {
+  background: #f1f5f9;
+  color: #3b82f6;
+}
+
+.btn-edit:hover {
+  background: #e2e8f0;
+}
+
+.btn-delete {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.btn-delete:hover {
+  background: #fee2e2;
+}
+
+/* ===== Dark Mode ===== */
+body.dark .admin-header h2,
+body.dark .admin-section h3 {
+  color: #eee;
+}
+
+body.dark .admin-tabs {
+  border-bottom-color: #2d2d44;
+}
+
+body.dark .admin-tabs button {
+  color: #999;
+}
+
+body.dark .admin-tabs button:hover {
+  background: #2a2a3e;
+  color: #ccc;
+}
+
+body.dark .admin-tabs button.active {
+  background: #d86b94;
+  color: white;
+}
+
+body.dark .admin-order-card {
+  background: #1e1e2e;
+  border-color: #2d2d44;
+}
+
+body.dark .order-header {
+  border-bottom-color: #2d2d44;
+}
+
+body.dark .order-id {
+  color: #eee;
+}
+
+body.dark .order-customer-info p {
+  color: #ccc;
+}
+
+body.dark .order-items-list {
+  background: #252538;
+}
+
+body.dark .order-items-list ul {
+  color: #ccc;
+}
+
+body.dark .status-dropdown {
+  background: #2a2a3e;
+  color: #eee;
+  border-color: #3d3d55;
+}
+
+body.dark .table-responsive {
+  background: #1e1e2e;
+}
+
+body.dark .products-table th {
+  background: #252538;
+  color: #ddd;
+  border-bottom-color: #2d2d44;
+}
+
+body.dark .products-table td {
+  border-bottom-color: #2d2d44;
+  color: #eee;
+}
+
+body.dark .products-table tbody tr:hover {
+  background-color: #252538;
+}
+
+body.dark .category-badge {
+  background: #334155;
+  color: #cbd5e1;
+}
+
+body.dark .btn-edit {
+  background: #1e293b;
+  color: #60a5fa;
+}
+
+body.dark .btn-edit:hover {
+  background: #334155;
+}
+
+body.dark .btn-delete {
+  background: #451a1a;
+  color: #f87171;
+}
+
+body.dark .btn-delete:hover {
+  background: #7f1d1d;
+}
+
+body.dark .empty-state {
+  background: #1e1e2e;
+  color: #999;
+  border: 1px solid #2d2d44;
 }

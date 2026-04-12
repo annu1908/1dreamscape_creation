@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   customerName: { type: String, required: true },
   customerEmail: { type: String, required: true },
   deliveryAddress: { type: String, required: true },
@@ -20,7 +21,13 @@ const orderSchema = new mongoose.Schema({
   paymentId: { type: String, required: true },         // Razorpay payment ID
   paymentStatus: { type: String, default: "success" }, // Defaulting to success
    razorpayOrderId: { type: String },                // Optional if you want to store
-   razorpaySignature:{type: String},
+   razorpaySignature:{ type: String },
+
+  status: {
+    type: String,
+    enum: ['processing', 'shipped', 'delivered', 'cancelled'],
+    default: 'processing',
+  },
 
 }, { timestamps: true });
 

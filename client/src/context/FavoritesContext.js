@@ -10,12 +10,15 @@ export const FavoritesProvider = ({ children }) => {
     setFavorites(savedFavorites);
   }, []);
 
-  const toggleFavorite = (productId) => {
+  const toggleFavorite = (product) => {
     let updatedFavorites;
-    if (favorites.includes(productId)) {
-      updatedFavorites = favorites.filter(id => id !== productId);
+    // Compare by _id since we store full product objects
+    const isFavorited = favorites.some(fav => fav._id === product._id);
+
+    if (isFavorited) {
+      updatedFavorites = favorites.filter(fav => fav._id !== product._id);
     } else {
-      updatedFavorites = [...favorites, productId];
+      updatedFavorites = [...favorites, product];
     }
 
     setFavorites(updatedFavorites);

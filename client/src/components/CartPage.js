@@ -1,13 +1,15 @@
 import React from 'react';
-import './CartPage.css'; 
+import './CartPage.css';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
-
-const CartPage = ({ cartItems, onRemoveFromCart, onUpdateQuantity }) => {
+const CartPage = () => {
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
   const deliveryCharge = 50;
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const total = subtotal + deliveryCharge;
-const navigate=useNavigate();
+  const navigate = useNavigate();
+
   return (
     <div className="cart-container">
       <h2>Your Cart</h2>
@@ -22,12 +24,12 @@ const navigate=useNavigate();
                 <h4>{item.title}</h4>
                 <p>₹{item.price}</p>
                 <div className="quantity-controls">
-                  <button onClick={() => onUpdateQuantity(item._id, item.quantity - 1)}>-</button>
+                  <button onClick={() => updateQuantity(item._id, item.quantity - 1)}>-</button>
                   <span>{item.quantity}</span>
-                  <button onClick={() => onUpdateQuantity(item._id, item.quantity + 1)}>+</button>
+                  <button onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</button>
                 </div>
               </div>
-              <button className="remove-btn" onClick={() => onRemoveFromCart(item._id)}>Remove</button>
+              <button className="remove-btn" onClick={() => removeFromCart(item._id)}>Remove</button>
             </div>
           ))}
 
@@ -35,7 +37,7 @@ const navigate=useNavigate();
             <p>Subtotal: ₹{subtotal}</p>
             <p>Delivery Charges: ₹{deliveryCharge}</p>
             <h3>Total: ₹{total}</h3>
-            <button className="checkout-btn" onClick={()=>navigate('/checkout')}>Proceed to Checkout</button>
+            <button className="checkout-btn" onClick={() => navigate('/checkout')}>Proceed to Checkout</button>
           </div>
         </>
       )}

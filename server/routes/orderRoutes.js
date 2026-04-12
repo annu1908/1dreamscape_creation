@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const Order = require('../models/Order');
+const verifyToken = require('../middleware/authMiddleware');
+const adminOnly = require('../middleware/adminMiddleware');
 require('dotenv').config();
 
 // Razorpay instance
@@ -12,9 +15,14 @@ const instance = new Razorpay({
 
 // ============================
 // Route 1: Create Razorpay Order
+// (consolidated from razorpayRoutes.js)
 // ============================
-router.post('/create-order', async (req, res) => {
+router.post('/create-order', verifyToken, async (req, res) => {
   const { amount } = req.body;
+
+  if (!amount) {
+    return res.status(400).json({ message: 'Amount is required' });
+  }
 
   const options = {
     amount: amount * 100, // amount in paisa
@@ -33,8 +41,9 @@ router.post('/create-order', async (req, res) => {
 
 // ============================
 // Route 2: Save Final Order after Payment
+// (protected + signature verification)
 // ============================
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   try {
     const {
       customerName,
@@ -46,9 +55,22 @@ router.post('/', async (req, res) => {
       total,
       paymentId,
       paymentStatus,
+      razorpayOrderId,
+      razorpaySignature,
     } = req.body;
 
+    // ✅ Verify Razorpay payment signature
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.SECRET_KEY)
+      .update(razorpayOrderId + '|' + paymentId)
+      .digest('hex');
+
+    if (generatedSignature !== razorpaySignature) {
+      return res.status(400).json({ message: 'Payment verification failed. Invalid signature.' });
+    }
+
     const newOrder = new Order({
+      userId: req.user.userId,
       customerName,
       customerEmail,
       deliveryAddress,
@@ -58,6 +80,8 @@ router.post('/', async (req, res) => {
       total,
       paymentId,
       paymentStatus,
+      razorpayOrderId,
+      razorpaySignature,
     });
 
     const savedOrder = await newOrder.save();
@@ -70,12 +94,57 @@ router.post('/', async (req, res) => {
     res.status(500).json({ message: 'Order saving failed' });
   }
 });
-router.get('/', async (req, res) => {
+
+// ============================
+// Route 3: Get All Orders (Admin Only)
+// ============================
+router.get('/', verifyToken, adminOnly, async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
+// ============================
+// Route 4: Get Orders for Logged-in User
+// ============================
+router.get('/my-orders', verifyToken, async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.user.userId }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch your orders' });
+  }
+});
+
+// ============================
+// Route 5: Update Order Status (Admin Only)
+// ============================
+router.put('/:id/status', verifyToken, adminOnly, async (req, res) => {
+  const { status } = req.body;
+  const validStatuses = ['processing', 'shipped', 'delivered', 'cancelled'];
+
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ message: 'Invalid or missing status' });
+  }
+
+  try {
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json(order);
+  } catch (error) {
+    console.error('Failed to update order status:', error);
+    res.status(500).json({ error: 'Failed to update order status' });
   }
 });
 
