@@ -99,9 +99,9 @@ const Login = () => {
               <label className="remember-me">
                 <input type="checkbox" /> Remember me
               </label>
-              <a href="#" className="forgot-password" onClick={(e) => { e.preventDefault(); alert('Password reset coming soon!'); }}>
+              <button type="button" className="forgot-password" onClick={() => alert('Password reset coming soon!')}>
                 Forgot password?
-              </a>
+              </button>
             </div>
 
             <button type="submit" className="auth-submit-btn">Sign In</button>
