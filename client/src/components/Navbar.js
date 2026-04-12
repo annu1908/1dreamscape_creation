@@ -41,8 +41,14 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
-        <Link to="/" className="logo">Dreamscape Creation</Link>
+        <button className={`menu-toggle ${menuOpen ? 'active' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle Menu">
+          <div className="hamburger-box">
+            <div className="hamburger-inner"></div>
+          </div>
+        </button>
+        <Link to="/" className="logo">
+          Dreamscape <span className="logo-accent">Creation</span>
+        </Link>
       </div>
 
       <div className="navbar-right">
@@ -59,6 +65,10 @@ const Navbar = () => {
             </>
           ) : (
             <>
+              <Link to="/profile" className="nav-link mobile-only" onClick={() => setMenuOpen(false)}>My Profile</Link>
+              {user && user.role === 'admin' && (
+                <Link to="/admin" className="nav-link mobile-only" onClick={() => setMenuOpen(false)}>Admin Dashboard</Link>
+              )}
               <Link to="/orders" className="nav-link" onClick={() => setMenuOpen(false)}>My Orders</Link>
 
               {/* Desktop initial + dropdown */}
@@ -98,6 +108,7 @@ const Navbar = () => {
           <ThemeToggle />
         </div>
       </div>
+      {menuOpen && <div className="nav-backdrop" onClick={() => setMenuOpen(false)}></div>}
     </nav>
   );
 };

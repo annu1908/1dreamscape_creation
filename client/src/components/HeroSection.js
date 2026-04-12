@@ -59,7 +59,7 @@ const HeroSection = () => {
 
           <div className="hero__actions">
             <button 
-              onClick={() => document.getElementById('product-section')?.scrollIntoView({ behavior: 'smooth' })} 
+              onClick={() => document.getElementById('product-list')?.scrollIntoView({ behavior: 'smooth' })} 
               className="hero__btn hero__btn--primary"
             >
               <span>Shop Collection</span>
@@ -79,7 +79,7 @@ const HeroSection = () => {
               </svg>
             </button>
             <button 
-              onClick={() => document.getElementById('product-section')?.scrollIntoView({ behavior: 'smooth' })} 
+              onClick={() => document.getElementById('product-list')?.scrollIntoView({ behavior: 'smooth' })} 
               className="hero__btn hero__btn--secondary"
             >
               Explore Categories
