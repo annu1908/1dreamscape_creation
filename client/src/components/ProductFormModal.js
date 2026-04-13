@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ProductFormModal.css';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
@@ -80,7 +81,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
             {initialData && initialData.image && !imageFile && (
               <div className="current-image-preview">
                 <p>Current Image:</p>
-                <img src={initialData.image} alt="Current product" width="100" />
+                <img src={getImageUrl(initialData.image)} alt="Current product" width="100" />
               </div>
             )}
             <input type="file" accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} />

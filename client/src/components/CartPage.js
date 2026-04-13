@@ -2,6 +2,7 @@ import React from 'react';
 import './CartPage.css';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
@@ -19,7 +20,7 @@ const CartPage = () => {
         <>
           {cartItems.map((item) => (
             <div key={item._id} className="cart-item">
-              <img src={item.image || 'placeholder.jpg'} alt={item.title} className="cart-img" />
+              <img src={item.image ? getImageUrl(item.image) : 'placeholder.jpg'} alt={item.title} className="cart-img" />
               <div className="cart-details">
                 <h4>{item.title}</h4>
                 <p>₹{item.price}</p>

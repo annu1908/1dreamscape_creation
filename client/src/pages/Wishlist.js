@@ -2,6 +2,7 @@ import React from 'react';
 import { useFavorites } from '../context/FavoritesContext';
 import { Link } from 'react-router-dom';
 import './Wishlist.css'; // optional styling
+import { getImageUrl } from '../utils/imageUtils';
 
 const Wishlist = () => {
   const { favorites, toggleFavorite } = useFavorites();
@@ -17,7 +18,7 @@ const Wishlist = () => {
         {favorites.map(product => (
           <div className="wishlist-item" key={product._id}>
             <Link to={`/product/${product._id}`} className="wishlist-link">
-              <img src={product.image} alt={product.title} />
+              <img src={getImageUrl(product.image)} alt={product.title} />
               <h3>{product.title}</h3>
               <p>₹{product.price}</p>
             </Link>

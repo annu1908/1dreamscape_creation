@@ -1,98 +1,295 @@
-.contact-container {
-  max-width: 600px;
-  margin: 60px auto;
-  padding: 30px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  transition: background 0.3s ease;
+/* ============================================
+   CONTACT US PAGE
+   Premium, Modern UI, Responsive Layout
+   ============================================ */
+
+.contact-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px;
+  min-height: 80vh;
 }
 
-.contact-container h2 {
+.contact-header {
   text-align: center;
-  color: #d86b94;
-  margin-bottom: 20px;
+  margin-bottom: 60px;
 }
 
-.contact-form {
+.contact-header h1 {
+  font-size: 3rem;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #d86b94, #212135);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.contact-header p {
+  color: #666;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 40px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* ---------- Left Panel: Info ---------- */
+.contact-info-panel {
+  padding: 50px 40px;
+  background: linear-gradient(135deg, #1f1f33 0%, #2d2248 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.info-block {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.info-icon {
+  font-size: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+  backdrop-filter: blur(5px);
+}
+
+.info-block h3 {
+  font-size: 1.1rem;
+  margin: 0 0 8px 0;
+  color: #fff;
+}
+
+.info-block p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.info-sub {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+  display: block;
+}
+
+/* ---------- Right Panel: Form ---------- */
+.contact-form-panel {
+  padding: 50px;
+  background: #fff;
+}
+
+.contact-form h2 {
+  font-size: 2rem;
+  color: #1a1a2e;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
 }
 
+.form-group.row {
+  flex-direction: row;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .contact-form label {
-  margin-top: 10px;
-  font-weight: bold;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
 }
 
 .contact-form input,
 .contact-form textarea {
-  padding: 12px;
-  margin-top: 5px;
-  font-size: 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  transition: border-color 0.3s ease;
-  background: #fff;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1rem;
+  border: 1.5px solid #eaeaea;
+  border-radius: 12px;
+  background: #fcfcfc;
   color: #333;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: #aaa;
 }
 
 .contact-form input:focus,
 .contact-form textarea:focus {
   outline: none;
   border-color: #d86b94;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(216, 107, 148, 0.1);
 }
 
-.contact-form button {
-  margin-top: 20px;
-  padding: 12px;
-  background-color: #d86b94;
+.contact-form textarea {
+  resize: vertical;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #d86b94, #c45a82);
   color: #fff;
-  border: none;
-  cursor: pointer;
-  border-radius: 8px;
+  padding: 16px 32px;
+  font-size: 1.05rem;
   font-weight: 600;
-  font-size: 15px;
-  transition: background 0.3s ease;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(216, 107, 148, 0.3);
 }
 
-.contact-form button:hover {
-  background-color: #c25a82;
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(216, 107, 148, 0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .form-status {
-  margin-top: 10px;
-  color: green;
-  font-weight: 500;
   text-align: center;
+  margin-top: 16px;
+  font-weight: 500;
+  padding: 12px;
+  border-radius: 8px;
 }
 
-/* ===== Dark Mode ===== */
-body.dark .contact-container {
-  background: #1e1e2e;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+.form-status.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
 }
 
-body.dark .contact-container h2 {
-  color: #e899b6;
+.form-status.error {
+  background: rgba(2ef, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+body.dark .contact-header h1 {
+  background: linear-gradient(135deg, #e899b6, #e8c07a);
+  -webkit-background-clip: text;
+}
+
+body.dark .contact-header p {
+  color: #aaa;
+}
+
+body.dark .contact-layout {
+  background: #17172a;
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .contact-form-panel {
+  background: #1c1c31;
+}
+
+body.dark .contact-form h2 {
+  color: #fff;
+}
+
+body.dark .contact-form label {
+  color: #e0e0e0;
 }
 
 body.dark .contact-form input,
 body.dark .contact-form textarea {
   background: #252540;
-  border-color: #3d3d55;
-  color: #eee;
-}
-
-body.dark .contact-form input:focus,
-body.dark .contact-form textarea:focus {
-  border-color: #d86b94;
+  border-color: #383854;
+  color: #fff;
 }
 
 body.dark .contact-form input::placeholder,
 body.dark .contact-form textarea::placeholder {
-  color: #777;
+  color: #666;
 }
 
-body.dark .contact-form label {
-  color: #ccc;
+body.dark .contact-form input:focus,
+body.dark .contact-form textarea:focus {
+  background: #2a2a46;
+  border-color: #d86b94;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .contact-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .contact-info-panel {
+    padding: 40px 30px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .info-block {
+    flex: 1;
+    min-width: 250px;
+  }
+}
+
+@media (max-width: 600px) {
+  .contact-page {
+    padding: 40px 20px;
+  }
+
+  .contact-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .contact-form-panel {
+    padding: 30px 20px;
+  }
+
+  .form-group.row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .info-block {
+    min-width: 100%;
+  }
 }

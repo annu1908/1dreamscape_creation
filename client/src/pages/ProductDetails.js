@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useFavorites } from '../context/FavoritesContext';
 import { useCart } from '../context/CartContext';
 import API from '../api';
+import { getImageUrl } from '../utils/imageUtils';
 
 const StarRating = ({ rating, onRate, interactive = false }) => {
   const [hoveredStar, setHoveredStar] = useState(0);
@@ -112,7 +113,7 @@ const ProductDetails = () => {
       
       <div className="product-details-container">
         <div className="product-image-section">
-          <img src={product.image} alt={product.title} />
+          <img src={getImageUrl(product.image)} alt={product.title} />
         </div>
         
         <div className="info">

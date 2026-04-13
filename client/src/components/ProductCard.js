@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useFavorites } from '../context/FavoritesContext';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductCard = ({ product }) => {
   const { favorites, toggleFavorite } = useFavorites();
@@ -15,7 +16,7 @@ const ProductCard = ({ product }) => {
     <div className='product-card'>
       <Link to={`/product/${product._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="image-container">
-          <img src={product.image} alt={product.title} />
+          <img src={getImageUrl(product.image)} alt={product.title} />
           <span
             className={`heart-icon ${isFavorited ? 'favorited' : ''}`}
             onClick={(e) => {

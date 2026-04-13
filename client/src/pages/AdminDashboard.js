@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import './AdminDashboard.css';
 import API from '../api';
 import ProductFormModal from '../components/ProductFormModal';
+import { getImageUrl } from '../utils/imageUtils';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'products'
@@ -100,14 +101,11 @@ const AdminDashboard = () => {
 
   const handleModalSubmit = async (formData) => {
     try {
-      // Because we use Multer (FormData), we must override the Content-Type header
-      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
-      
       if (editingProduct) {
-        await API.put(`/api/products/${editingProduct._id}`, formData, config);
+        await API.put(`/api/products/${editingProduct._id}`, formData);
         toast.success('Product updated successfully!');
       } else {
-        await API.post('/api/products', formData, config);
+        await API.post('/api/products', formData);
         toast.success('Product added successfully!');
       }
       setIsModalOpen(false);
@@ -209,7 +207,7 @@ const AdminDashboard = () => {
                 {products.map(product => (
                   <tr key={product._id}>
                     <td>
-                      <img src={product.image} alt={product.title} className="table-img" />
+                      <img src={getImageUrl(product.image)} alt={product.title} className="table-img" />
                     </td>
                     <td>{product.title}</td>
                     <td><span className="category-badge">{product.category}</span></td>
