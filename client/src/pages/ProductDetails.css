@@ -553,3 +553,239 @@ body.dark .star {
 body.dark .star--interactive:hover {
   color: #f59e0b;
 }
+
+/* ===== Breadcrumbs ===== */
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.breadcrumbs a {
+  color: #d86b94;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumbs a:hover {
+  color: #b85078;
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: #cbd5e1;
+  font-size: 16px;
+}
+
+.breadcrumb-current {
+  color: #64748b;
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.dark .breadcrumb-sep {
+  color: #475569;
+}
+
+body.dark .breadcrumb-current {
+  color: #94a3b8;
+}
+
+/* ===== Zoom Hint ===== */
+.product-image-section {
+  cursor: zoom-in;
+  position: relative;
+}
+
+.zoom-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.product-image-section:hover .zoom-hint {
+  opacity: 1;
+}
+
+/* ===== Image Zoom Lightbox ===== */
+.zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: zoom-out;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.zoom-image {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.zoom-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+  z-index: 10000;
+}
+
+.zoom-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== Stock Tag ===== */
+.stock-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #166534;
+  margin-left: 8px;
+}
+
+.stock-tag.low-stock {
+  background: #fef3c7;
+  color: #92400e;
+  animation: pulse-stock 2s ease-in-out infinite;
+}
+
+@keyframes pulse-stock {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+body.dark .stock-tag {
+  background: #14532d;
+  color: #86efac;
+}
+
+body.dark .stock-tag.low-stock {
+  background: #78350f;
+  color: #fde68a;
+}
+
+/* ===== Related Products ===== */
+.related-products-section {
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+
+.related-products-section h3 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.related-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.related-product-card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.related-product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.related-product-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.related-product-info {
+  padding: 14px;
+}
+
+.related-product-info h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.related-product-price {
+  font-size: 16px;
+  font-weight: 800;
+  color: #d86b94;
+}
+
+body.dark .related-products-section h3 {
+  color: #f1f5f9;
+  border-bottom-color: #2d2d44;
+}
+
+body.dark .related-product-card {
+  background: #1e1e2e;
+  border-color: #2d2d44;
+}
+
+body.dark .related-product-info h4 {
+  color: #f1f5f9;
+}

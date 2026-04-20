@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
+import { SkeletonGrid } from './SkeletonCard';
 import './ProductList.css';
 import API from '../api';
 
@@ -8,8 +9,8 @@ const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filtered, setFiltered] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -18,44 +19,33 @@ const ProductList = () => {
   const searchParams = new URLSearchParams(location.search);
   const categoryParam = searchParams.get('category') || 'all';
 
-  // Load products once
-  useEffect(() => {
-    API.get('/api/products/')
-      .then((res) => {
-        setProducts(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError('Failed to load products');
-        setLoading(false);
-      });
-  }, []);
+  // Fetch products whenever filters change
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (categoryParam !== 'all') params.set('category', categoryParam);
+      if (searchQuery.trim()) params.set('search', searchQuery.trim());
+      if (sortBy) params.set('sort', sortBy);
 
-  // Filter products whenever products, URL category, or search query changes
-  useEffect(() => {
-    if (products.length === 0) return;
-
-    let result = products;
-
-    // Category filter
-    if (categoryParam !== 'all') {
-      result = result.filter((p) =>
-        p.category?.toLowerCase().trim() === categoryParam.toLowerCase().trim()
-      );
+      const res = await API.get(`/api/products/?${params.toString()}`);
+      // Handle both paginated and non-paginated responses
+      const data = Array.isArray(res.data) ? res.data : res.data.products;
+      setProducts(data || []);
+    } catch (err) {
+      setError('Failed to load products');
+    } finally {
+      setLoading(false);
     }
+  }, [categoryParam, searchQuery, sortBy]);
 
-    // Search filter
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      result = result.filter((p) =>
-        p.title?.toLowerCase().includes(q) ||
-        p.description?.toLowerCase().includes(q) ||
-        p.category?.toLowerCase().includes(q)
-      );
-    }
-
-    setFiltered(result);
-  }, [products, categoryParam, searchQuery]);
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      fetchProducts();
+    }, 300); // Debounce search
+    return () => clearTimeout(debounce);
+  }, [fetchProducts]);
 
   const handleFilter = (cat) => {
     if (cat === 'all') {
@@ -69,7 +59,7 @@ const ProductList = () => {
     setSearchQuery(e.target.value);
   };
 
-  if (loading) return <div className="loading-spinner"><div className="spinner"></div><p>Loading Products...</p></div>;
+  if (loading) return <div className="product-list"><h2>Our Products</h2><SkeletonGrid count={8} /></div>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
@@ -91,17 +81,29 @@ const ProductList = () => {
         )}
       </div>
 
-      <div className="filter-buttons">
-        <button onClick={() => handleFilter('all')} className={categoryParam === 'all' ? 'active' : ''}>All</button>
-        <button onClick={() => handleFilter('resin')} className={categoryParam === 'resin' ? 'active' : ''}>Resin</button>
-        <button onClick={() => handleFilter('embroidery')} className={categoryParam === 'embroidery' ? 'active' : ''}>Embroidery</button>
-        <button onClick={() => handleFilter('sketch')} className={categoryParam === 'sketch' ? 'active' : ''}>Sketch</button>
-        <button onClick={() => handleFilter('crochet')} className={categoryParam === 'crochet' ? 'active' : ''}>Crochet</button>
+      <div className="filter-sort-row">
+        <div className="filter-buttons">
+          <button onClick={() => handleFilter('all')} className={categoryParam === 'all' ? 'active' : ''}>All</button>
+          <button onClick={() => handleFilter('resin')} className={categoryParam === 'resin' ? 'active' : ''}>Resin</button>
+          <button onClick={() => handleFilter('embroidery')} className={categoryParam === 'embroidery' ? 'active' : ''}>Embroidery</button>
+          <button onClick={() => handleFilter('sketch')} className={categoryParam === 'sketch' ? 'active' : ''}>Sketch</button>
+          <button onClick={() => handleFilter('crochet')} className={categoryParam === 'crochet' ? 'active' : ''}>Crochet</button>
+        </div>
+
+        <div className="sort-dropdown">
+          <label>Sort by:</label>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="price_asc">Price: Low → High</option>
+            <option value="price_desc">Price: High → Low</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid">
-        {filtered.length > 0 ? (
-          filtered.map((product) => (
+        {products.length > 0 ? (
+          products.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))
         ) : (

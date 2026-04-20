@@ -14,4 +14,24 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+// Auto-logout on 401 (expired/invalid token)
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Only redirect if we had a token (i.e., user was logged in)
+      const hadToken = localStorage.getItem('token');
+      if (hadToken) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Redirect to login if not already there
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default API;

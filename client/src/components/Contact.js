@@ -45,16 +45,16 @@ const Contact = () => {
           <div className="info-block">
             <span className="info-icon">📍</span>
             <div>
-              <h3>Our Head Office</h3>
-              <p>123 Dreamscape Boulevard<br/>Creativity District, Mumbai 400001</p>
+              <h3>Our Studio</h3>
+              <p>Dreamscape Creations<br/>Handcrafted in India 🇮🇳</p>
             </div>
           </div>
           
           <div className="info-block">
             <span className="info-icon">📞</span>
             <div>
-              <h3>Phone Number</h3>
-              <p>+91 98765 43210<br/><span className="info-sub">Mon-Fri, 9am to 6pm</span></p>
+              <h3>WhatsApp</h3>
+              <p><a href="https://wa.me/919817800613" style={{color: 'inherit', textDecoration: 'underline'}}>+91 98178 00613</a><br/><span className="info-sub">Chat with us anytime</span></p>
             </div>
           </div>
 
@@ -62,7 +62,7 @@ const Contact = () => {
             <span className="info-icon">✉️</span>
             <div>
               <h3>Email Address</h3>
-              <p>support@dreamscape.com<br/><span className="info-sub">We usually reply within 24 hours</span></p>
+              <p><a href="mailto:annu02sandhu@gmail.com" style={{color: 'inherit', textDecoration: 'underline'}}>annu02sandhu@gmail.com</a><br/><span className="info-sub">We usually reply within 24 hours</span></p>
             </div>
           </div>
         </div>

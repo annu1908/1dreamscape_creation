@@ -4,6 +4,7 @@ import './ProductDetails.css';
 import { toast } from 'react-toastify';
 import { useFavorites } from '../context/FavoritesContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import API from '../api';
 import { getImageUrl } from '../utils/imageUtils';
 
@@ -32,6 +33,13 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const { favorites, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
+  const { user, isAuthenticated } = useAuth();
+
+  // Image zoom state
+  const [zoomOpen, setZoomOpen] = useState(false);
+
+  // Related products state
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   // Reviews state
   const [reviews, setReviews] = useState([]);
@@ -41,17 +49,20 @@ const ProductDetails = () => {
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState('');
 
-  const user = (() => {
-    try {
-      const data = localStorage.getItem('user');
-      return data ? JSON.parse(data) : null;
-    } catch { return null; }
-  })();
-  const token = localStorage.getItem('token');
-
   useEffect(() => {
     API.get(`/api/products/${id}`)
-      .then(res => setProduct(res.data))
+      .then(res => {
+        setProduct(res.data);
+        // Fetch related products from same category
+        if (res.data.category) {
+          API.get(`/api/products/?category=${res.data.category}`)
+            .then(relRes => {
+              const data = Array.isArray(relRes.data) ? relRes.data : relRes.data.products;
+              setRelatedProducts((data || []).filter(p => p._id !== id).slice(0, 4));
+            })
+            .catch(() => {});
+        }
+      })
       .catch(err => console.error('Error fetching product:', err));
 
     fetchReviews();
@@ -109,11 +120,26 @@ const ProductDetails = () => {
 
   return (
     <div className="product-details-page">
-      <Link to="/" className="back-btn">⬅ Back to Shop</Link>
+
+      {/* Breadcrumbs */}
+      <nav className="breadcrumbs" aria-label="Breadcrumb">
+        <Link to="/">Home</Link>
+        <span className="breadcrumb-sep">›</span>
+        {product.category && (
+          <>
+            <Link to={`/?category=${product.category.toLowerCase()}`}>{product.category}</Link>
+            <span className="breadcrumb-sep">›</span>
+          </>
+        )}
+        <span className="breadcrumb-current">{product.title}</span>
+      </nav>
       
       <div className="product-details-container">
-        <div className="product-image-section">
-          <img src={getImageUrl(product.image)} alt={product.title} />
+        <div className="product-image-section" onClick={() => setZoomOpen(true)} title="Click to zoom">
+          <img src={getImageUrl(product.image)} alt={product.title} loading="lazy" />
+          <div className="zoom-hint">
+            <span>🔍</span> Click to zoom
+          </div>
         </div>
         
         <div className="info">
@@ -130,6 +156,11 @@ const ProductDetails = () => {
           
           <div className="product-meta">
             <span className="category-tag">{product.category}</span>
+            {product.stock > 0 && (
+              <span className={`stock-tag ${product.stock <= 5 ? 'low-stock' : ''}`}>
+                {product.stock <= 5 ? `Only ${product.stock} left!` : 'In Stock'}
+              </span>
+            )}
           </div>
           
           <div className="product-description">
@@ -139,7 +170,7 @@ const ProductDetails = () => {
           <div className="actions">
             <button className="primary-btn" onClick={() => {
               addToCart(product);
-              toast.success("Added to cart!", { autoClose: 1500 });
+              toast.success(`${product.title} added to cart!`, { autoClose: 1500 });
             }}>
               <span className="icon">🛍️</span> Add to Cart
             </button>
@@ -154,12 +185,25 @@ const ProductDetails = () => {
         </div>
       </div>
 
+      {/* Image Zoom Lightbox */}
+      {zoomOpen && (
+        <div className="zoom-overlay" onClick={() => setZoomOpen(false)}>
+          <button className="zoom-close" onClick={() => setZoomOpen(false)}>✕</button>
+          <img
+            src={getImageUrl(product.image)}
+            alt={product.title}
+            className="zoom-image"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
       {/* Reviews Section */}
       <div className="reviews-section">
         <h3>Customer Reviews</h3>
 
         {/* Review Form */}
-        {token ? (
+        {isAuthenticated ? (
           <form className="review-form" onSubmit={handleSubmitReview}>
             <h4>Write a Review</h4>
             <div className="review-form-rating">
@@ -214,6 +258,24 @@ const ProductDetails = () => {
           <p className="no-reviews">No reviews yet. Be the first to review this product!</p>
         )}
       </div>
+
+      {/* Related Products Section */}
+      {relatedProducts.length > 0 && (
+        <div className="related-products-section">
+          <h3>You May Also Like</h3>
+          <div className="related-products-grid">
+            {relatedProducts.map((rp) => (
+              <Link to={`/product/${rp._id}`} key={rp._id} className="related-product-card">
+                <img src={getImageUrl(rp.image)} alt={rp.title} loading="lazy" />
+                <div className="related-product-info">
+                  <h4>{rp.title}</h4>
+                  <span className="related-product-price">₹{rp.price}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

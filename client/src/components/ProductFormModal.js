@@ -8,6 +8,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     description: '',
     price: '',
     category: '',
+    imageUrl: '',
   });
   const [imageFile, setImageFile] = useState(null);
 
@@ -18,10 +19,11 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         description: initialData.description || '',
         price: initialData.price || '',
         category: initialData.category || '',
+        imageUrl: initialData.image || '',
       });
       setImageFile(null); // Reset file input when editing
     } else {
-      setFormData({ title: '', description: '', price: '', category: '' });
+      setFormData({ title: '', description: '', price: '', category: '', imageUrl: '' });
       setImageFile(null);
     }
   }, [initialData, isOpen]);
@@ -46,6 +48,8 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     
     if (imageFile) {
       data.append('image', imageFile);
+    } else if (formData.imageUrl) {
+      data.append('imageUrl', formData.imageUrl);
     }
 
     onSubmit(data);
@@ -84,7 +88,19 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                 <img src={getImageUrl(initialData.image)} alt="Current product" width="100" />
               </div>
             )}
-            <input type="file" accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} />
+            
+            <div className="image-input-container">
+              <input 
+                type="text" 
+                name="imageUrl" 
+                placeholder="Paste Image URL here (e.g. from Cloudinary)" 
+                value={formData.imageUrl} 
+                onChange={handleChange} 
+                style={{ marginBottom: '10px', width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '14px' }}
+              />
+              <div style={{ textAlign: 'center', margin: '5px 0', color: '#666', fontSize: '12px', fontWeight: 'bold' }}>— OR UPLOAD LOCAL FILE —</div>
+              <input type="file" accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} />
+            </div>
           </div>
 
           <div className="modal-actions">

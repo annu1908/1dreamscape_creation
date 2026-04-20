@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../api';
+import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
 const Login = () => {
@@ -12,6 +13,7 @@ const Login = () => {
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ 
@@ -29,12 +31,11 @@ const Login = () => {
       const response = await API.post('/api/auth/login', formData);
       const { token, name, email, role } = response.data;
 
-      // Save token and user info
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify({ name, email, role }));
+      // Use AuthContext to store auth state
+      login(token, { name, email, role });
 
       setMessage('Login successful! Redirecting...');
-      setTimeout(() => navigate('/'), 1500); // Small delay to show success
+      setTimeout(() => navigate('/'), 1500);
     } catch (err) {
       console.error(err);
       setIsError(true);
@@ -58,17 +59,7 @@ const Login = () => {
             </div>
           )}
 
-          {/* Social Auth Mock Buttons */}
-          <div className="auth-social-group">
-            <button type="button" className="auth-social-btn" onClick={() => alert('Google login coming soon!')}>
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" />
-              Log in with Google
-            </button>
-          </div>
 
-          <div className="auth-separator">
-            <span>or sign in with email</span>
-          </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="input-group">
@@ -95,14 +86,7 @@ const Login = () => {
               />
             </div>
 
-            <div className="auth-options">
-              <label className="remember-me">
-                <input type="checkbox" /> Remember me
-              </label>
-              <button type="button" className="forgot-password" onClick={() => alert('Password reset coming soon!')}>
-                Forgot password?
-              </button>
-            </div>
+
 
             <button type="submit" className="auth-submit-btn">Sign In</button>
           </form>

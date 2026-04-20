@@ -3,33 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import ThemeToggle from './ThemeToggle';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { cartCount } = useCart();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
-  const token = localStorage.getItem('token');
-  const userData = localStorage.getItem('user');
-
-  let user = null;
-  let userInitial = '';
-
-  if (userData && userData !== 'undefined') {
-    try {
-      user = JSON.parse(userData);
-      if (user && user.name) {
-        userInitial = user.name.charAt(0).toUpperCase();
-      }
-    } catch (error) {
-      console.error('Invalid user data in localStorage:', error);
-    }
-  }
+  const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : '';
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
     navigate('/login');
     window.location.reload();
   };
@@ -58,7 +44,7 @@ const Navbar = () => {
           <Link to="/contact" className="nav-link" onClick={() => setMenuOpen(false)}>Contact</Link>
           <Link to="/wishlist" className="nav-link" onClick={() => setMenuOpen(false)}>Wishlist</Link>
 
-          {!token ? (
+          {!isAuthenticated ? (
             <>
               <Link to="/login" className="nav-link" onClick={() => setMenuOpen(false)}>Login</Link>
               <Link to="/signup" className="nav-link" onClick={() => setMenuOpen(false)}>Signup</Link>
@@ -66,7 +52,7 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/profile" className="nav-link mobile-only" onClick={() => setMenuOpen(false)}>My Profile</Link>
-              {user && user.role === 'admin' && (
+              {isAdmin && (
                 <Link to="/admin" className="nav-link mobile-only" onClick={() => setMenuOpen(false)}>Admin Dashboard</Link>
               )}
               <Link to="/orders" className="nav-link" onClick={() => setMenuOpen(false)}>My Orders</Link>
@@ -85,7 +71,7 @@ const Navbar = () => {
                     <div className="dropdown-divider"></div>
                     <Link to="/profile" className="dropdown-item" onClick={() => setDropdownOpen(false)}>👤 My Profile</Link>
                     <Link to="/orders" className="dropdown-item" onClick={() => setDropdownOpen(false)}>📦 My Orders</Link>
-                    {user.role === 'admin' && (
+                    {isAdmin && (
                       <Link to="/admin" className="dropdown-item" onClick={() => setDropdownOpen(false)}>⚙️ Admin Panel</Link>
                     )}
                     <div className="dropdown-divider"></div>

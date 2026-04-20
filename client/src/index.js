@@ -6,16 +6,19 @@ import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from './context/ThemeContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ThemeProvider>
-      <FavoritesProvider>
-        <CartProvider>
-          <App />
-        </CartProvider>
-      </FavoritesProvider>
+      <AuthProvider>
+        <FavoritesProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </FavoritesProvider>
+      </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>
 );
