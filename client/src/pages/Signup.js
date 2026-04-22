@@ -5,7 +5,7 @@ import './Auth.css';
 
 // Robust email validation
 const isValidEmail = (email) => {
-  const re = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!re.test(email)) return false;
   // Block common disposable / obviously fake patterns
   const blocked = ['test@test', 'fake@', 'asdf@', '123@'];
