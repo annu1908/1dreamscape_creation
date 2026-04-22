@@ -72,8 +72,6 @@
 .pd-gallery {
   display: flex;
   gap: 12px;
-  position: sticky;
-  top: 88px;
 }
 
 .pd-gallery__thumbs {

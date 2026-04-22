@@ -30,8 +30,12 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
 }
 
-/* ── Left: Logo ── */
-.navbar-left { flex: 0 0 auto; }
+/* ── Left: Hamburger + Logo ── */
+.navbar-left {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
 
 .navbar-logo {
   display: flex;
@@ -373,7 +377,8 @@
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s;
-  margin-left: 8px;
+  margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
@@ -392,18 +397,18 @@
 .hamburger-btn--open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .hamburger-btn--open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* ── Mobile Drawer ── */
+/* ── Mobile Drawer ── slides in from LEFT ── */
 .mobile-drawer {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   height: 100vh;
   width: min(320px, 85vw);
   background: #0e0e18;
-  border-left: 1px solid rgba(255,255,255,0.06);
-  box-shadow: -20px 0 50px rgba(0,0,0,0.6);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 20px 0 50px rgba(0,0,0,0.6);
   z-index: 1200;
-  transform: translateX(100%);
+  transform: translateX(-100%);
   transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
   display: flex;
   flex-direction: column;
@@ -507,14 +512,43 @@
 }
 
 /* ── Responsive ── */
+
+/* Desktop-only elements: hidden on mobile */
+.nav-desktop-only { display: flex; }
+
 @media (max-width: 992px) {
-  .navbar { padding: 0 20px; }
-  .navbar-center { display: none; }
+  .navbar {
+    padding: 0 16px;
+    height: 60px;
+  }
+
+  /* Show hamburger */
   .hamburger-btn { display: flex; }
-  .nav-auth-btns { display: none; }
-  /* User dropdown still visible but compact */
+
+  /* Hide desktop-only nav elements */
+  .navbar-center    { display: none; }
+  .nav-desktop-only { display: none !important; }
+  .nav-auth-btns    { display: none; }
+
+  /* Right side: only cart + theme toggle */
+  .navbar-right {
+    gap: 4px;
+  }
+
+  /* Tighten icon buttons on mobile */
+  .nav-icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .theme-toggle-icon-btn {
+    width: 34px;
+    height: 34px;
+  }
 }
 
 @media (max-width: 480px) {
-  .navbar { height: 60px; }
+  .navbar { height: 56px; padding: 0 12px; }
+  .navbar-logo-img { height: 34px; }
+  .hamburger-btn { width: 36px; height: 36px; }
 }
