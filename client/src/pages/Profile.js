@@ -1,122 +1,246 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import API from '../api';
 import './Profile.css';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, logout } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    if (!token || !userData) {
+    if (!isAuthenticated) {
       navigate('/login');
       return;
     }
-    try {
-      setUser(JSON.parse(userData));
-    } catch {
-      navigate('/login');
-    }
-  }, [navigate]);
+    // Fetch recent orders
+    API.get('/api/orders/my-orders')
+      .then(res => setOrders(res.data || []))
+      .catch(() => setOrders([]))
+      .finally(() => setOrdersLoading(false));
+  }, [isAuthenticated, navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
     navigate('/login');
-    window.location.reload();
   };
 
   if (!user) return null;
 
   const initials = user.name
-    ? user.name.split(' ').map(n => n.charAt(0).toUpperCase()).join('')
+    ? user.name.split(' ').map(n => n.charAt(0).toUpperCase()).join('').slice(0, 2)
     : '?';
 
-  const memberSince = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-  });
+  const totalSpent = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const delivered = orders.filter(o => o.status === 'delivered').length;
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'processing': return { bg: '#fef3c7', color: '#92400e' };
+      case 'shipped': return { bg: '#dbeafe', color: '#1e40af' };
+      case 'delivered': return { bg: '#dcfce7', color: '#166534' };
+      case 'cancelled': return { bg: '#fee2e2', color: '#991b1b' };
+      default: return { bg: '#f1f5f9', color: '#64748b' };
+    }
+  };
 
   return (
     <div className="profile-page">
-      <div className="profile-container">
-
-        {/* Profile Header Card */}
-        <div className="profile-header-card">
-          <div className="profile-avatar-wrapper">
-            <div className="profile-avatar">
-              {initials}
-            </div>
-            <div className="profile-avatar-ring"></div>
-          </div>
-          <div className="profile-header-info">
+      {/* Hero Banner */}
+      <div className="profile-hero">
+        <div className="profile-hero-content">
+          <div className="profile-avatar-large">{initials}</div>
+          <div className="profile-hero-info">
             <h1>{user.name}</h1>
-            <p className="profile-email">{user.email}</p>
-            <div className="profile-badges">
-              <span className="badge badge-role">
+            <p className="profile-hero-email">{user.email}</p>
+            <div className="profile-hero-badges">
+              <span className={`profile-badge ${user.role === 'admin' ? 'badge-admin' : 'badge-customer'}`}>
                 {user.role === 'admin' ? '👑 Admin' : '🛍️ Customer'}
               </span>
-              <span className="badge badge-member">
-                Member since {memberSince}
-              </span>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Quick Actions */}
-        <div className="profile-section">
-          <h2 className="section-title">Quick Actions</h2>
-          <div className="quick-actions-grid">
-            <Link to="/orders" className="action-card">
-              <div className="action-icon">📦</div>
-              <h3>My Orders</h3>
-              <p>Track and manage your orders</p>
-            </Link>
-            <Link to="/wishlist" className="action-card">
-              <div className="action-icon">❤️</div>
-              <h3>Wishlist</h3>
-              <p>Items you've saved for later</p>
-            </Link>
-            <Link to="/cart" className="action-card">
-              <div className="action-icon">🛒</div>
-              <h3>Cart</h3>
-              <p>View items in your cart</p>
-            </Link>
-            <Link to="/" className="action-card">
-              <div className="action-icon">🏠</div>
-              <h3>Shop</h3>
-              <p>Browse our entire collection</p>
-            </Link>
+      <div className="profile-body">
+        {/* Stats Row */}
+        <div className="profile-stats-row">
+          <div className="profile-stat">
+            <span className="profile-stat-value">{orders.length}</span>
+            <span className="profile-stat-label">Total Orders</span>
+          </div>
+          <div className="profile-stat">
+            <span className="profile-stat-value">{delivered}</span>
+            <span className="profile-stat-label">Delivered</span>
+          </div>
+          <div className="profile-stat">
+            <span className="profile-stat-value">₹{totalSpent.toLocaleString('en-IN')}</span>
+            <span className="profile-stat-label">Total Spent</span>
           </div>
         </div>
 
-        {/* Account Details */}
-        <div className="profile-section">
-          <h2 className="section-title">Account Details</h2>
-          <div className="account-details-card">
-            <div className="detail-row">
-              <span className="detail-label">Full Name</span>
-              <span className="detail-value">{user.name}</span>
+        {/* Tabs */}
+        <div className="profile-tabs">
+          {['overview', 'orders', 'account'].map(tab => (
+            <button
+              key={tab}
+              className={`profile-tab-btn ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === 'overview' ? '🏠 Overview' : tab === 'orders' ? '📦 My Orders' : '👤 Account'}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <div className="profile-tab-content">
+            <div className="profile-quick-grid">
+              <Link to="/orders" className="profile-quick-card">
+                <div className="profile-quick-icon">📦</div>
+                <div>
+                  <h4>My Orders</h4>
+                  <p>Track and manage orders</p>
+                </div>
+                <span className="profile-quick-arrow">›</span>
+              </Link>
+              <Link to="/wishlist" className="profile-quick-card">
+                <div className="profile-quick-icon">❤️</div>
+                <div>
+                  <h4>Wishlist</h4>
+                  <p>Items saved for later</p>
+                </div>
+                <span className="profile-quick-arrow">›</span>
+              </Link>
+              <Link to="/cart" className="profile-quick-card">
+                <div className="profile-quick-icon">🛒</div>
+                <div>
+                  <h4>My Cart</h4>
+                  <p>Ready to checkout</p>
+                </div>
+                <span className="profile-quick-arrow">›</span>
+              </Link>
+              <Link to="/" className="profile-quick-card">
+                <div className="profile-quick-icon">🎨</div>
+                <div>
+                  <h4>Browse Shop</h4>
+                  <p>Discover new products</p>
+                </div>
+                <span className="profile-quick-arrow">›</span>
+              </Link>
+              {user.role === 'admin' && (
+                <Link to="/admin" className="profile-quick-card profile-quick-card--admin">
+                  <div className="profile-quick-icon">⚙️</div>
+                  <div>
+                    <h4>Admin Panel</h4>
+                    <p>Manage store</p>
+                  </div>
+                  <span className="profile-quick-arrow">›</span>
+                </Link>
+              )}
             </div>
-            <div className="detail-row">
-              <span className="detail-label">Email Address</span>
-              <span className="detail-value">{user.email}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Account Type</span>
-              <span className="detail-value">{user.role === 'admin' ? 'Administrator' : 'Customer'}</span>
-            </div>
+
+            {/* Recent Orders preview */}
+            {!ordersLoading && orders.length > 0 && (
+              <div className="profile-recent-orders">
+                <div className="profile-section-header">
+                  <h3>Recent Orders</h3>
+                  <Link to="/orders" className="profile-view-all">View all →</Link>
+                </div>
+                {orders.slice(0, 3).map(order => {
+                  const sc = getStatusColor(order.status);
+                  return (
+                    <div key={order._id} className="profile-order-row">
+                      <div className="profile-order-id">
+                        <span>#</span>{order._id?.slice(-8).toUpperCase()}
+                      </div>
+                      <div className="profile-order-items">
+                        {(order.items || []).slice(0, 2).map(i => i.title).join(', ')}
+                        {(order.items || []).length > 2 && ` +${order.items.length - 2} more`}
+                      </div>
+                      <div className="profile-order-total">₹{order.total?.toLocaleString('en-IN')}</div>
+                      <span className="profile-order-status" style={{ background: sc.bg, color: sc.color }}>
+                        {order.status}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
-        {/* Danger Zone */}
-        <div className="profile-section">
-          <button className="logout-btn" onClick={handleLogout}>
-            Sign Out
-          </button>
-        </div>
+        {activeTab === 'orders' && (
+          <div className="profile-tab-content">
+            {ordersLoading ? (
+              <div className="profile-loading">Loading orders...</div>
+            ) : orders.length === 0 ? (
+              <div className="profile-empty">
+                <span>📦</span>
+                <p>No orders yet. <Link to="/">Start shopping!</Link></p>
+              </div>
+            ) : (
+              <div className="profile-orders-list">
+                {orders.map(order => {
+                  const sc = getStatusColor(order.status);
+                  return (
+                    <div key={order._id} className="profile-order-card">
+                      <div className="profile-order-card-header">
+                        <div>
+                          <span className="profile-order-card-id">Order #{order._id?.slice(-8).toUpperCase()}</span>
+                          <span className="profile-order-card-date">
+                            {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                        </div>
+                        <span className="profile-order-status" style={{ background: sc.bg, color: sc.color }}>
+                          {order.status}
+                        </span>
+                      </div>
+                      <div className="profile-order-card-items">
+                        {(order.items || []).map((item, i) => (
+                          <span key={i} className="profile-order-item-chip">
+                            {item.title} × {item.quantity}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="profile-order-card-footer">
+                        <span className="profile-order-address">📍 {order.deliveryAddress || 'N/A'}</span>
+                        <span className="profile-order-card-total">₹{order.total?.toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
+        {activeTab === 'account' && (
+          <div className="profile-tab-content">
+            <div className="profile-account-card">
+              <h3>Account Details</h3>
+              <div className="profile-account-row">
+                <span className="profile-account-label">Full Name</span>
+                <span className="profile-account-value">{user.name}</span>
+              </div>
+              <div className="profile-account-row">
+                <span className="profile-account-label">Email Address</span>
+                <span className="profile-account-value">{user.email}</span>
+              </div>
+              <div className="profile-account-row">
+                <span className="profile-account-label">Account Type</span>
+                <span className="profile-account-value">{user.role === 'admin' ? 'Administrator' : 'Customer'}</span>
+              </div>
+            </div>
+
+            <button className="profile-logout-btn" onClick={handleLogout}>
+              🚪 Sign Out
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

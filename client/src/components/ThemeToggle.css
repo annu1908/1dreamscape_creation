@@ -1,14 +1,61 @@
-.theme-toggle-btn {
-  background: none;
+/* ============================================================
+   THEME TOGGLE — matches nav-icon-btn style exactly
+   ============================================================ */
+
+.theme-toggle-icon-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: transparent;
   border: none;
-  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  color: inherit;
-  margin-left: 10px;
-  padding: 5px;
-  transition: transform 0.3s ease;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+  flex-shrink: 0;
 }
 
-.theme-toggle-btn:hover {
-  transform: scale(1.2);
+.theme-toggle-icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Sun — warm gold on hover */
+.theme-toggle-icon-btn:hover .toggle-icon--sun {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
+}
+
+/* Moon — pink/lavender on hover to match theme */
+.theme-toggle-icon-btn:hover .toggle-icon--moon {
+  color: #d86b94;
+  filter: drop-shadow(0 0 6px rgba(216, 107, 148, 0.55));
+}
+
+/* Spin animation for sun */
+.toggle-icon--sun {
+  transition: color 0.2s, filter 0.2s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-toggle-icon-btn:hover .toggle-icon--sun {
+  transform: rotate(30deg) scale(1.1);
+}
+
+/* Tilt animation for moon */
+.toggle-icon--moon {
+  transition: color 0.2s, filter 0.2s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-toggle-icon-btn:hover .toggle-icon--moon {
+  transform: rotate(-15deg) scale(1.1);
+}
+
+/* Focus ring */
+.theme-toggle-icon-btn:focus-visible {
+  outline: 2px solid #d86b94;
+  outline-offset: 2px;
 }

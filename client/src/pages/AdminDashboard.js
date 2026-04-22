@@ -7,7 +7,7 @@ import ProductFormModal from '../components/ProductFormModal';
 import { getImageUrl } from '../utils/imageUtils';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'products'
+  const [activeTab, setActiveTab] = useState('analytics'); // 'analytics', 'orders', or 'products'
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,7 +15,7 @@ const AdminDashboard = () => {
   
   const navigate = useNavigate();
 
-  // 🛡️ Access Control
+  // Access Control
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -29,11 +29,25 @@ const AdminDashboard = () => {
     }
   }, [navigate]);
 
-  // 📦 Fetch Data
+  // Fetch Data
   useEffect(() => {
     fetchOrders();
     fetchProducts();
   }, []);
+
+  // Analytics computed from existing data
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const avgOrderValue = orders.length > 0 ? Math.round(totalRevenue / orders.length) : 0;
+  const productSales = {};
+  orders.forEach(order => {
+    (order.items || []).forEach(item => {
+      const key = item.title || item._id;
+      productSales[key] = (productSales[key] || 0) + (item.quantity || 1);
+    });
+  });
+  const topProducts = Object.entries(productSales)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
 
   const fetchOrders = async () => {
     try {
@@ -123,6 +137,12 @@ const AdminDashboard = () => {
       </div>
 
       <div className="admin-tabs">
+        <button
+          className={activeTab === 'analytics' ? 'active' : ''}
+          onClick={() => setActiveTab('analytics')}
+        >
+          📊 Analytics
+        </button>
         <button 
           className={activeTab === 'orders' ? 'active' : ''} 
           onClick={() => setActiveTab('orders')}
@@ -136,6 +156,70 @@ const AdminDashboard = () => {
           Manage Products
         </button>
       </div>
+
+      {activeTab === 'analytics' && (
+        <div className="admin-section">
+          <h3>Store Analytics</h3>
+          <div className="analytics-stats">
+            <div className="stat-card">
+              <div className="stat-icon">💰</div>
+              <div className="stat-value">₹{totalRevenue.toLocaleString('en-IN')}</div>
+              <div className="stat-label">Total Revenue</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">📦</div>
+              <div className="stat-value">{orders.length}</div>
+              <div className="stat-label">Total Orders</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">🛍️</div>
+              <div className="stat-value">{products.length}</div>
+              <div className="stat-label">Products Listed</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">📈</div>
+              <div className="stat-value">₹{avgOrderValue.toLocaleString('en-IN')}</div>
+              <div className="stat-label">Avg Order Value</div>
+            </div>
+          </div>
+
+          {topProducts.length > 0 && (
+            <div className="top-products-section">
+              <h4>Top Selling Products</h4>
+              <div className="top-products-list">
+                {topProducts.map(([name, qty], i) => (
+                  <div key={name} className="top-product-row">
+                    <span className="top-rank">#{i + 1}</span>
+                    <span className="top-name">{name}</span>
+                    <span className="top-qty">{qty} sold</span>
+                    <div className="top-bar-wrap">
+                      <div
+                        className="top-bar"
+                        style={{ width: `${Math.round((qty / topProducts[0][1]) * 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="order-status-summary">
+            <h4>Orders by Status</h4>
+            <div className="status-pills">
+              {['processing', 'shipped', 'delivered', 'cancelled'].map(status => {
+                const count = orders.filter(o => o.status === status).length;
+                return (
+                  <div key={status} className={`status-pill status-${status}`}>
+                    <span className="status-count">{count}</span>
+                    <span className="status-name">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {activeTab === 'orders' && (
         <div className="admin-section">

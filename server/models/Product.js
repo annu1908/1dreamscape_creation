@@ -17,8 +17,12 @@ const productSchema = new mongoose.Schema({
     }],
     stock: {
         type: Number,
-        default: 0, // 0 means unlimited/not tracked
+        default: null, // null = made to order / unlimited. Only set a number if tracking stock.
         min: 0,
+    },
+    stockTracked: {
+        type: Boolean,
+        default: false, // false = always available (custom/handmade). true = check stock field.
     },
     originalPrice: { // For showing discount
         type: Number,

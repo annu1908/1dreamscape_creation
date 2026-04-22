@@ -5,21 +5,29 @@ import { SkeletonGrid } from './SkeletonCard';
 import './ProductList.css';
 import API from '../api';
 
+const ITEMS_PER_PAGE = 8;
+
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Extract category from URL
   const searchParams = new URLSearchParams(location.search);
   const categoryParam = searchParams.get('category') || 'all';
 
-  // Fetch products whenever filters change
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryParam, searchQuery, sortBy]);
+
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -28,43 +36,77 @@ const ProductList = () => {
       if (categoryParam !== 'all') params.set('category', categoryParam);
       if (searchQuery.trim()) params.set('search', searchQuery.trim());
       if (sortBy) params.set('sort', sortBy);
+      params.set('page', currentPage);
+      params.set('limit', ITEMS_PER_PAGE);
 
       const res = await API.get(`/api/products/?${params.toString()}`);
-      // Handle both paginated and non-paginated responses
-      const data = Array.isArray(res.data) ? res.data : res.data.products;
-      setProducts(data || []);
+
+      if (Array.isArray(res.data)) {
+        // Non-paginated fallback
+        setProducts(res.data);
+        setTotalCount(res.data.length);
+        setTotalPages(Math.ceil(res.data.length / ITEMS_PER_PAGE) || 1);
+      } else {
+        setProducts(res.data.products || []);
+        const total = res.data.totalProducts || res.data.total || 0;
+        setTotalCount(total);
+        setTotalPages(res.data.totalPages || Math.ceil(total / ITEMS_PER_PAGE) || 1);
+      }
     } catch (err) {
-      setError('Failed to load products');
+      setError('Failed to load products. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [categoryParam, searchQuery, sortBy]);
+  }, [categoryParam, searchQuery, sortBy, currentPage]);
 
   useEffect(() => {
-    const debounce = setTimeout(() => {
-      fetchProducts();
-    }, 300); // Debounce search
+    const debounce = setTimeout(() => fetchProducts(), 300);
     return () => clearTimeout(debounce);
   }, [fetchProducts]);
 
   const handleFilter = (cat) => {
-    if (cat === 'all') {
-      navigate('/');
-    } else {
-      navigate(`/?category=${cat}`);
-    }
+    if (cat === 'all') navigate('/');
+    else navigate(`/?category=${cat}`);
   };
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
+  const handleSearch = (e) => setSearchQuery(e.target.value);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Smooth scroll to product section
+    document.getElementById('product-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  if (loading) return <div className="product-list"><h2>Our Products</h2><SkeletonGrid count={8} /></div>;
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
+  const categories = [
+    { key: 'all', label: 'All' },
+    { key: 'resin', label: '🪩 Resin' },
+    { key: 'embroidery', label: '🧵 Embroidery' },
+    { key: 'sketch', label: '✏️ Sketch' },
+    { key: 'crochet', label: '🧶 Crochet' },
+  ];
+
+  // Pagination helpers
+  const getPaginationRange = () => {
+    const delta = 2;
+    const range = [];
+    const left = Math.max(2, currentPage - delta);
+    const right = Math.min(totalPages - 1, currentPage + delta);
+    range.push(1);
+    if (left > 2) range.push('...');
+    for (let i = left; i <= right; i++) range.push(i);
+    if (right < totalPages - 1) range.push('...');
+    if (totalPages > 1) range.push(totalPages);
+    return range;
+  };
 
   return (
-    <div id="product-section" className='product-list'>
-      <h2>Our Products</h2>
+    <div id="product-section" className="product-list">
+      <div className="product-list-header">
+        <h2>Our Products</h2>
+        {!loading && totalCount > 0 && (
+          <span className="product-count">{totalCount} product{totalCount !== 1 ? 's' : ''}</span>
+        )}
+      </div>
 
       <div className="search-bar">
         <span className="search-icon">🔍</span>
@@ -75,19 +117,21 @@ const ProductList = () => {
           onChange={handleSearch}
         />
         {searchQuery && (
-          <button className="search-clear" onClick={() => setSearchQuery('')}>
-            ✕
-          </button>
+          <button className="search-clear" onClick={() => setSearchQuery('')}>✕</button>
         )}
       </div>
 
       <div className="filter-sort-row">
         <div className="filter-buttons">
-          <button onClick={() => handleFilter('all')} className={categoryParam === 'all' ? 'active' : ''}>All</button>
-          <button onClick={() => handleFilter('resin')} className={categoryParam === 'resin' ? 'active' : ''}>Resin</button>
-          <button onClick={() => handleFilter('embroidery')} className={categoryParam === 'embroidery' ? 'active' : ''}>Embroidery</button>
-          <button onClick={() => handleFilter('sketch')} className={categoryParam === 'sketch' ? 'active' : ''}>Sketch</button>
-          <button onClick={() => handleFilter('crochet')} className={categoryParam === 'crochet' ? 'active' : ''}>Crochet</button>
+          {categories.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => handleFilter(key)}
+              className={categoryParam === key ? 'active' : ''}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
         <div className="sort-dropdown">
@@ -101,21 +145,62 @@ const ProductList = () => {
         </div>
       </div>
 
-      <div className="grid">
-        {products.length > 0 ? (
-          products.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))
-        ) : (
-          <div className="no-results">
-            <span className="no-results-icon">🔍</span>
-            <p>No products found {searchQuery ? `for "${searchQuery}"` : `in "${categoryParam}"`}</p>
-            <button onClick={() => { navigate('/'); setSearchQuery(''); }}>
-              View All Products
-            </button>
+      {loading ? (
+        <SkeletonGrid count={ITEMS_PER_PAGE} />
+      ) : error ? (
+        <p className="products-error">{error}</p>
+      ) : products.length > 0 ? (
+        <>
+          <div className="grid">
+            {products.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
           </div>
-        )}
-      </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                ‹ Prev
+              </button>
+
+              {getPaginationRange().map((page, i) => (
+                page === '...'
+                  ? <span key={`ellipsis-${i}`} className="pagination-ellipsis">…</span>
+                  : (
+                    <button
+                      key={page}
+                      className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                      onClick={() => handlePageChange(page)}
+                    >
+                      {page}
+                    </button>
+                  )
+              ))}
+
+              <button
+                className="pagination-btn"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next ›
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="no-results">
+          <span className="no-results-icon">🔍</span>
+          <p>No products found {searchQuery ? `for "${searchQuery}"` : `in "${categoryParam}"`}</p>
+          <button onClick={() => { navigate('/'); setSearchQuery(''); }}>
+            View All Products
+          </button>
+        </div>
+      )}
     </div>
   );
 };
