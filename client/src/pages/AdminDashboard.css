@@ -446,9 +446,28 @@ body.dark .empty-state {
   font-size: 14px;
   font-weight: 600;
   color: #334155;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Allow wrapping on mobile instead of truncating */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+  .top-product-row {
+    grid-template-columns: 24px 1fr;
+    gap: 8px;
+  }
+  .top-name {
+    grid-column: 2;
+  }
+  .top-qty {
+    grid-column: 2;
+    text-align: left;
+    font-size: 12px;
+  }
+  .top-bar-wrap {
+    grid-column: 1 / -1;
+  }
 }
 
 .top-qty {

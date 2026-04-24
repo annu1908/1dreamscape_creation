@@ -102,7 +102,22 @@
 }
 
 @media (max-width: 700px) {
-  .tst-grid { grid-template-columns: 1fr; }
+  .tst-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 14px;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tst-grid::-webkit-scrollbar { display: none; }
+  .tst-card {
+    min-width: 280px;
+    max-width: 85vw;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
 }
 
 /* ── Individual Card ── */
