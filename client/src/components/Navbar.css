@@ -529,9 +529,10 @@
   .hamburger-btn { display: flex; }
 
   /* Hide desktop-only nav elements */
-  .navbar-center    { display: none; }
+  .navbar-center    { display: none !important; }
   .nav-desktop-only { display: none !important; }
-  .nav-auth-btns    { display: none; }
+  .nav-auth-btns,
+  .navbar-right > .nav-auth-btns { display: none !important; }
 
   /* Right side: only cart + theme toggle */
   .navbar-right {
