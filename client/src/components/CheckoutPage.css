@@ -23,9 +23,6 @@
   .checkout-layout {
     grid-template-columns: 1fr;
   }
-  .order-summary {
-    position: static;
-  }
 }
 
 /* Order Summary */
@@ -34,8 +31,6 @@
   border-radius: 20px;
   padding: 28px;
   border: 1px solid #e2e8f0;
-  position: sticky;
-  top: 100px;
 }
 
 .order-summary h3 {
