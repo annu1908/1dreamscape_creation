@@ -2,16 +2,18 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.BREVO_LOGIN,
+    pass: process.env.BREVO_API_KEY,
   },
 });
 
 const sendEmail = async (to, otp, subject = 'Your Verification Code - Dreamscape Creation', bodyText = 'Thank you for signing up with Dreamscape Creation. Use the verification code below to complete your registration.') => {
   const mailOptions = {
-    from: `"Dreamscape Creation" <${process.env.EMAIL_USER}>`,
+    from: `"Dreamscape Creation" <${process.env.BREVO_EMAIL}>`,
     to,
     subject,
     html: `
