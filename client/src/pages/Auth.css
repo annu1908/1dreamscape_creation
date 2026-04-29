@@ -433,3 +433,142 @@ body.dark .remember-me {
 body.dark .auth-redirect {
   color: #94a3b8;
 }
+
+/* ===== OTP Verification Styles ===== */
+.otp-verify-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.otp-verify-section .auth-form-header {
+  width: 100%;
+}
+
+.otp-verify-section .auth-form {
+  width: 100%;
+}
+
+.otp-verify-section .auth-alert {
+  width: 100%;
+}
+
+.otp-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+  margin-bottom: 20px;
+  animation: otpBounce 0.6s ease;
+}
+
+.otp-success-icon {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+}
+
+@keyframes otpBounce {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.otp-email-display {
+  font-weight: 700;
+  color: #d86b94;
+  font-size: 15px;
+  margin-top: 4px;
+  word-break: break-all;
+}
+
+.otp-actions {
+  text-align: center;
+  width: 100%;
+}
+
+.otp-resend-text {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.otp-cooldown {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.otp-resend-btn {
+  background: none;
+  border: none;
+  color: #d86b94;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.otp-resend-btn:hover {
+  color: #b85078;
+}
+
+.otp-resend-btn:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.otp-back-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.otp-back-btn:hover {
+  color: #d86b94;
+}
+
+/* Dark mode OTP styles */
+body.dark .otp-icon-wrapper {
+  background: linear-gradient(135deg, #3b1f2b, #2d1a2e);
+}
+
+body.dark .otp-success-icon {
+  background: linear-gradient(135deg, #1a2e22, #132a1c);
+}
+
+body.dark .otp-email-display {
+  color: #e895b3;
+}
+
+body.dark .otp-resend-text {
+  color: #94a3b8;
+}
+
+body.dark .otp-cooldown {
+  color: #64748b;
+}
+
+body.dark .otp-resend-btn {
+  color: #e895b3;
+}
+
+body.dark .otp-resend-btn:hover {
+  color: #d86b94;
+}
+
+body.dark .otp-back-btn {
+  color: #94a3b8;
+}
+
+body.dark .otp-back-btn:hover {
+  color: #e895b3;
+}

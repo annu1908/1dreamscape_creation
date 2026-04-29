@@ -32,13 +32,35 @@ const EyeIcon = ({ show }) => show ? (
   </svg>
 );
 
+const MailIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+    style={{ color: '#d86b94' }}>
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+
+const CheckCircleIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+    style={{ color: '#10b981' }}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+    <polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+);
+
 const Signup = () => {
+  const [step, setStep] = useState(1); // 1 = form, 2 = OTP, 3 = success
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [otp, setOtp] = useState('');
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -68,7 +90,8 @@ const Signup = () => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  // Step 1: Send OTP
+  const handleSendOtp = async (e) => {
     e.preventDefault();
     setMessage('');
     setIsError(false);
@@ -81,17 +104,79 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      await API.post('/api/auth/signup', formData);
-      setMessage('Account created successfully! Redirecting to login...');
-      setFormData({ name: '', email: '', password: '' });
-      setTimeout(() => navigate('/login'), 2000);
+      const res = await API.post('/api/auth/register', formData);
+      setMessage(res.data.message);
+      setIsError(false);
+      setStep(2);
+      startResendCooldown();
     } catch (err) {
       console.error(err);
       setIsError(true);
-      setMessage(err.response?.data?.message || 'Signup failed. This email might already be in use.');
+      setMessage(err.response?.data?.message || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Step 2: Verify OTP
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setMessage('');
+    setIsError(false);
+
+    if (!otp.trim() || otp.trim().length !== 6) {
+      setIsError(true);
+      setMessage('Please enter the 6-digit OTP.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await API.post('/api/auth/verify-otp', { email: formData.email, otp: otp.trim() });
+      setMessage(res.data.message);
+      setIsError(false);
+      setStep(3);
+      setTimeout(() => navigate('/login'), 3000);
+    } catch (err) {
+      console.error(err);
+      setIsError(true);
+      setMessage(err.response?.data?.message || 'Verification failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Resend OTP
+  const handleResendOtp = async () => {
+    setMessage('');
+    setIsError(false);
+    setResendLoading(true);
+    try {
+      const res = await API.post('/api/auth/resend-otp', { email: formData.email });
+      setMessage(res.data.message);
+      setIsError(false);
+      setOtp('');
+      startResendCooldown();
+    } catch (err) {
+      console.error(err);
+      setIsError(true);
+      setMessage(err.response?.data?.message || 'Failed to resend OTP.');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const startResendCooldown = () => {
+    setResendCooldown(30);
+    const interval = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const getPasswordStrength = (pwd) => {
@@ -104,87 +189,189 @@ const Signup = () => {
 
   const strength = getPasswordStrength(formData.password);
 
+  // Mask email for display: show first 3 chars + mask + domain
+  const maskEmail = (email) => {
+    const [local, domain] = email.split('@');
+    if (local.length <= 3) return email;
+    return `${local.slice(0, 3)}${'•'.repeat(local.length - 3)}@${domain}`;
+  };
+
   return (
     <div className="auth-page">
       <div className="auth-master-container auth-master-container--centered">
         <div className="auth-form-panel">
-          <div className="auth-form-header">
-            <h3>Create an Account</h3>
-            <p>Sign up now to start shopping unique creations.</p>
-          </div>
 
-          {message && (
-            <div className={`auth-alert ${isError ? 'auth-alert-error' : 'auth-alert-success'}`}>
-              {message}
+          {/* ============ STEP 1: Registration Form ============ */}
+          {step === 1 && (
+            <>
+              <div className="auth-form-header">
+                <h3>Create an Account</h3>
+                <p>Sign up now to start shopping unique creations.</p>
+              </div>
+
+              {message && (
+                <div className={`auth-alert ${isError ? 'auth-alert-error' : 'auth-alert-success'}`}>
+                  {message}
+                </div>
+              )}
+
+              <form onSubmit={handleSendOtp} className="auth-form" noValidate>
+                <div className={`input-group ${errors.name ? 'input-error' : ''}`}>
+                  <label>Full Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Jane Doe"
+                    value={formData.name}
+                    onChange={handleChange}
+                    autoComplete="name"
+                  />
+                  {errors.name && <span className="field-error">{errors.name}</span>}
+                </div>
+
+                <div className={`input-group ${errors.email ? 'input-error' : ''}`}>
+                  <label>Email Address</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    autoComplete="email"
+                  />
+                  {errors.email && <span className="field-error">{errors.email}</span>}
+                </div>
+
+                <div className={`input-group ${errors.password ? 'input-error' : ''}`}>
+                  <label>Password</label>
+                  <div className="password-wrapper">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      placeholder="At least 6 characters"
+                      value={formData.password}
+                      onChange={handleChange}
+                      autoComplete="new-password"
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      <EyeIcon show={showPassword} />
+                    </button>
+                  </div>
+                  {formData.password && strength && (
+                    <div className="password-strength">
+                      <div className="strength-bar">
+                        <div className="strength-fill" style={{ width: strength.width, background: strength.color }}></div>
+                      </div>
+                      <span className="strength-label" style={{ color: strength.color }}>{strength.label}</span>
+                    </div>
+                  )}
+                  {errors.password && <span className="field-error">{errors.password}</span>}
+                </div>
+
+                <button type="submit" className="auth-submit-btn" disabled={loading}>
+                  {loading ? 'Sending OTP...' : 'Send OTP'}
+                </button>
+              </form>
+
+              <p className="auth-redirect">
+                Already have an account? <Link to="/login">Sign in</Link>
+              </p>
+            </>
+          )}
+
+          {/* ============ STEP 2: OTP Verification ============ */}
+          {step === 2 && (
+            <>
+              <div className="otp-verify-section">
+                <div className="otp-icon-wrapper">
+                  <MailIcon />
+                </div>
+                <div className="auth-form-header" style={{ textAlign: 'center' }}>
+                  <h3>Verify Your Email</h3>
+                  <p>We've sent a 6-digit verification code to</p>
+                  <p className="otp-email-display">{maskEmail(formData.email)}</p>
+                </div>
+
+                {message && (
+                  <div className={`auth-alert ${isError ? 'auth-alert-error' : 'auth-alert-success'}`}>
+                    {message}
+                  </div>
+                )}
+
+                <form onSubmit={handleVerifyOtp} className="auth-form">
+                  <div className="input-group">
+                    <label>Enter OTP</label>
+                    <input
+                      type="text"
+                      name="otp"
+                      placeholder="Enter 6-digit code"
+                      value={otp}
+                      onChange={(e) => {
+                        // Only allow digits, max 6 characters
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                        setOtp(val);
+                      }}
+                      autoComplete="one-time-code"
+                      inputMode="numeric"
+                      maxLength={6}
+                      style={{ textAlign: 'center', letterSpacing: '8px', fontSize: '22px', fontWeight: '700' }}
+                    />
+                  </div>
+
+                  <button type="submit" className="auth-submit-btn" disabled={loading}>
+                    {loading ? 'Verifying...' : 'Verify'}
+                  </button>
+                </form>
+
+                <div className="otp-actions">
+                  <p className="otp-resend-text">
+                    Didn't receive the code?{' '}
+                    {resendCooldown > 0 ? (
+                      <span className="otp-cooldown">Resend in {resendCooldown}s</span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="otp-resend-btn"
+                        onClick={handleResendOtp}
+                        disabled={resendLoading}
+                      >
+                        {resendLoading ? 'Sending...' : 'Resend OTP'}
+                      </button>
+                    )}
+                  </p>
+                  <button
+                    type="button"
+                    className="otp-back-btn"
+                    onClick={() => { setStep(1); setMessage(''); setOtp(''); }}
+                  >
+                    ← Back to Signup
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* ============ STEP 3: Success ============ */}
+          {step === 3 && (
+            <div className="otp-verify-section">
+              <div className="otp-icon-wrapper otp-success-icon">
+                <CheckCircleIcon />
+              </div>
+              <div className="auth-form-header" style={{ textAlign: 'center' }}>
+                <h3>Email Verified! 🎉</h3>
+                <p>Your account has been verified successfully. Redirecting to login...</p>
+              </div>
+              <button className="auth-submit-btn" onClick={() => navigate('/login')}>
+                Go to Login
+              </button>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="auth-form" noValidate>
-            <div className={`input-group ${errors.name ? 'input-error' : ''}`}>
-              <label>Full Name</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Jane Doe"
-                value={formData.name}
-                onChange={handleChange}
-                autoComplete="name"
-              />
-              {errors.name && <span className="field-error">{errors.name}</span>}
-            </div>
-
-            <div className={`input-group ${errors.email ? 'input-error' : ''}`}>
-              <label>Email Address</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                autoComplete="email"
-              />
-              {errors.email && <span className="field-error">{errors.email}</span>}
-            </div>
-
-            <div className={`input-group ${errors.password ? 'input-error' : ''}`}>
-              <label>Password</label>
-              <div className="password-wrapper">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  placeholder="At least 6 characters"
-                  value={formData.password}
-                  onChange={handleChange}
-                  autoComplete="new-password"
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  <EyeIcon show={showPassword} />
-                </button>
-              </div>
-              {formData.password && strength && (
-                <div className="password-strength">
-                  <div className="strength-bar">
-                    <div className="strength-fill" style={{ width: strength.width, background: strength.color }}></div>
-                  </div>
-                  <span className="strength-label" style={{ color: strength.color }}>{strength.label}</span>
-                </div>
-              )}
-              {errors.password && <span className="field-error">{errors.password}</span>}
-            </div>
-
-            <button type="submit" className="auth-submit-btn" disabled={loading}>
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-          </form>
-
-          <p className="auth-redirect">
-            Already have an account? <Link to="/login">Sign in</Link>
-          </p>
         </div>
       </div>
     </div>

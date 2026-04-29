@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ProductFormModal.css';
 import { getImageUrl } from '../utils/imageUtils';
+import API from '../api';
 
 const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,9 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     imageUrl: '',
   });
   const [imageFile, setImageFile] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiMessage, setAiMessage] = useState(null); // { type: 'success' | 'error', text: string }
+  const aiFileInputRef = useRef(null);
 
   useEffect(() => {
     if (initialData) {
@@ -26,6 +30,8 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       setFormData({ title: '', description: '', price: '', category: '', imageUrl: '' });
       setImageFile(null);
     }
+    setAiMessage(null);
+    setAiLoading(false);
   }, [initialData, isOpen]);
 
   if (!isOpen) return null;
@@ -36,6 +42,69 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   const handleFileChange = (e) => {
     setImageFile(e.target.files[0]);
+  };
+
+  // Shared helper — calls the backend and auto-fills form fields
+  const runAiAnalysis = async (requestConfig) => {
+    setAiLoading(true);
+    setAiMessage(null);
+
+    try {
+      const res = await API.post('/api/admin/analyze-product', ...requestConfig);
+      const result = res.data;
+
+      // Auto-fill the text fields from AI response
+      setFormData((prev) => ({
+        ...prev,
+        title: result.title || prev.title,
+        category: result.category || prev.category,
+        price: result.price != null ? String(result.price) : prev.price,
+        description: result.description || prev.description,
+      }));
+
+      setAiMessage({
+        type: 'success',
+        text: '✅ Details filled by AI. You can edit before saving.',
+      });
+    } catch (err) {
+      console.error('AI analysis failed:', err);
+      setAiMessage({
+        type: 'error',
+        text: '⚠️ AI analysis failed. Please fill manually.',
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleAiAnalyse = () => {
+    // CASE 1 — Image URL is already pasted: send it as JSON directly
+    if (formData.imageUrl && formData.imageUrl.trim()) {
+      runAiAnalysis([
+        { imageUrl: formData.imageUrl.trim() },
+        { headers: { 'Content-Type': 'application/json' } },
+      ]);
+      return;
+    }
+
+    // CASE 2 — No URL: open file picker
+    aiFileInputRef.current.click();
+  };
+
+  const handleAiFileSelected = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const data = new FormData();
+    data.append('image', file);
+
+    await runAiAnalysis([
+      data,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    ]);
+
+    // Reset the file input so the same file can be re-selected
+    e.target.value = '';
   };
 
   const handleSubmit = (e) => {
@@ -60,6 +129,39 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       <div className="modal-content">
         <h2>{initialData ? 'Edit Product' : 'Add New Product'}</h2>
         <form onSubmit={handleSubmit} className="product-form">
+
+          {/* AI Analyse Section — only shown for new products */}
+          {!initialData && (
+            <div className="ai-analyse-section">
+              <div className="ai-analyse-row">
+                <button
+                  type="button"
+                  className="btn-ai-analyse"
+                  onClick={handleAiAnalyse}
+                  disabled={aiLoading}
+                >
+                  {aiLoading ? '⏳ Analysing image...' : '🤖 Analyse with AI'}
+                </button>
+                {aiLoading && (
+                  <span className="ai-loading-text">Analysing image...</span>
+                )}
+              </div>
+              {/* Hidden file input for AI analysis */}
+              <input
+                type="file"
+                ref={aiFileInputRef}
+                accept="image/jpeg, image/jpg, image/png, image/webp"
+                onChange={handleAiFileSelected}
+                style={{ display: 'none' }}
+              />
+              {aiMessage && (
+                <div className={`ai-message ai-message-${aiMessage.type}`}>
+                  {aiMessage.text}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="form-group">
             <label>Title</label>
             <input type="text" name="title" value={formData.title} onChange={handleChange} required />

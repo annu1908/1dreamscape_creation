@@ -47,7 +47,7 @@ const Login = () => {
     } catch (err) {
       console.error(err);
       setIsError(true);
-      setMessage('Invalid email or password. Please try again.');
+      setMessage(err.response?.data?.message || 'Invalid email or password. Please try again.');
     } finally {
       setLoading(false);
     }
