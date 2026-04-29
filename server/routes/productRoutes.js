@@ -7,7 +7,7 @@ const upload = require('../middleware/uploadMiddleware');
 
 // Wrapper to handle multer errors gracefully (e.g. when no file is sent)
 const optionalUpload = (req, res, next) => {
-  upload.single('image')(req, res, (err) => {
+  upload.fields([{ name: 'image', maxCount: 1 }, { name: 'images', maxCount: 10 }])(req, res, (err) => {
     if (err) {
       // If it's a multer error but we have an imageUrl, just continue
       console.warn('Multer warning:', err.message);
@@ -86,8 +86,15 @@ router.post('/', verifyToken, adminOnly, optionalUpload, async (req, res) => {
     let imageUrl = req.body.imageUrl || '';
 
     // If an image file was uploaded, use its local path
-    if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
+    if (req.files && req.files.image) {
+      imageUrl = `/uploads/${req.files.image[0].filename}`;
+    }
+
+    let imagesArray = req.body.images ? (Array.isArray(req.body.images) ? req.body.images : [req.body.images]) : [];
+    if (req.files && req.files.images) {
+      req.files.images.forEach(file => {
+        imagesArray.push(`/uploads/${file.filename}`);
+      });
     }
 
     const newProduct = new Product({
@@ -95,7 +102,8 @@ router.post('/', verifyToken, adminOnly, optionalUpload, async (req, res) => {
       description,
       price: Number(price),
       category,
-      image: imageUrl
+      image: imageUrl,
+      images: imagesArray
     });
 
     const savedProduct = await newProduct.save();
@@ -117,9 +125,21 @@ router.put('/:id', verifyToken, adminOnly, optionalUpload, async (req, res) => {
       updateData.image = req.body.imageUrl;
     }
 
-    // If a new image file was uploaded, override with local file path
-    if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+    // If a new primary image file was uploaded, override with local file path
+    if (req.files && req.files.image) {
+      updateData.image = `/uploads/${req.files.image[0].filename}`;
+    }
+
+    // Process additional images if updating
+    let imagesArray = req.body.images ? (Array.isArray(req.body.images) ? req.body.images : [req.body.images]) : [];
+    if (req.files && req.files.images) {
+      req.files.images.forEach(file => {
+        imagesArray.push(`/uploads/${file.filename}`);
+      });
+    }
+    // Update images array if URLs or files were provided
+    if (req.body.images || (req.files && req.files.images)) {
+       updateData.images = imagesArray;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(

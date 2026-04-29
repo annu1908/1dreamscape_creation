@@ -139,8 +139,15 @@ const CheckoutPage = () => {
         <div className="order-summary">
           <h3>Order Summary</h3>
           {cartItems.map((item) => (
-            <div key={item._id} className="checkout-item">
-              <span>{item.title} × {item.quantity}</span>
+            <div key={item.cartItemId || item._id} className="checkout-item">
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span>{item.title} × {item.quantity}</span>
+                {item.personalization && (
+                  <span style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px', lineHeight: '1.3' }}>
+                    Custom: {item.personalization}
+                  </span>
+                )}
+              </div>
               <span>₹{item.price * item.quantity}</span>
             </div>
           ))}

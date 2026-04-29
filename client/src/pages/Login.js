@@ -108,6 +108,12 @@ const Login = () => {
             <button type="submit" className="auth-submit-btn" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
+
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <Link to="/forgot-password" className="forgot-password" style={{ fontSize: '14px', color: '#d86b94', fontWeight: '600', textDecoration: 'none' }}>
+                Forgot your password?
+              </Link>
+            </div>
           </form>
 
           <p className="auth-redirect">

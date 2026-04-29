@@ -9,11 +9,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = async (to, otp) => {
+const sendEmail = async (to, otp, subject = 'Your Verification Code - Dreamscape Creation', bodyText = 'Thank you for signing up with Dreamscape Creation. Use the verification code below to complete your registration.') => {
   const mailOptions = {
     from: `"Dreamscape Creation" <${process.env.EMAIL_USER}>`,
     to,
-    subject: 'Your Verification Code - Dreamscape Creation',
+    subject,
     html: `
       <!DOCTYPE html>
       <html>
@@ -46,7 +46,7 @@ const sendEmail = async (to, otp) => {
                       Hello there! 👋
                     </p>
                     <p style="margin:0 0 28px;color:#64748b;font-size:15px;line-height:1.6;">
-                      Thank you for signing up with Dreamscape Creation. Use the verification code below to complete your registration.
+                      ${bodyText}
                     </p>
 
                     <!-- OTP Box -->

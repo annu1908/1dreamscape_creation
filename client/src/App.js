@@ -20,6 +20,7 @@ const CheckoutPage = lazy(() => import("./components/CheckoutPage"));
 const ThankYou = lazy(() => import("./pages/ThankYou"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Login = lazy(() => import("./pages/Login"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const Wishlist = lazy(() => import("./pages/Wishlist"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -72,6 +73,7 @@ function App() {
                 <Route path="/thankyou" element={<ProtectedRoute><ThankYou /></ProtectedRoute>} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/admin" element={<AdminDashboard />} />

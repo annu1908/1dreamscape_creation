@@ -11,7 +11,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     category: '',
     imageUrl: '',
   });
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiMessage, setAiMessage] = useState(null); // { type: 'success' | 'error', text: string }
   const aiFileInputRef = useRef(null);
@@ -25,10 +25,10 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         category: initialData.category || '',
         imageUrl: initialData.image || '',
       });
-      setImageFile(null); // Reset file input when editing
+      setImageFiles([]); // Reset file input when editing
     } else {
       setFormData({ title: '', description: '', price: '', category: '', imageUrl: '' });
-      setImageFile(null);
+      setImageFiles([]);
     }
     setAiMessage(null);
     setAiLoading(false);
@@ -41,7 +41,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   };
 
   const handleFileChange = (e) => {
-    setImageFile(e.target.files[0]);
+    setImageFiles(Array.from(e.target.files));
   };
 
   // Shared helper — calls the backend and auto-fills form fields
@@ -115,10 +115,19 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     data.append('price', formData.price);
     data.append('category', formData.category);
     
-    if (imageFile) {
-      data.append('image', imageFile);
+    if (imageFiles.length > 0) {
+      data.append('image', imageFiles[0]); // First one is primary
+      for (let i = 1; i < imageFiles.length; i++) {
+        data.append('images', imageFiles[i]);
+      }
     } else if (formData.imageUrl) {
-      data.append('imageUrl', formData.imageUrl);
+      const urls = formData.imageUrl.split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
+      if (urls.length > 0) {
+        data.append('imageUrl', urls[0]);
+        for (let i = 1; i < urls.length; i++) {
+          data.append('images', urls[i]);
+        }
+      }
     }
 
     onSubmit(data);
@@ -184,7 +193,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
 
           <div className="form-group">
             <label>Product Image</label>
-            {initialData && initialData.image && !imageFile && (
+            {initialData && initialData.image && imageFiles.length === 0 && (
               <div className="current-image-preview">
                 <p>Current Image:</p>
                 <img src={getImageUrl(initialData.image)} alt="Current product" width="100" />
@@ -192,16 +201,21 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
             )}
             
             <div className="image-input-container">
-              <input 
-                type="text" 
+              <textarea 
                 name="imageUrl" 
-                placeholder="Paste Image URL here (e.g. from Cloudinary)" 
+                placeholder="Paste Image URL(s) here (one per line or comma separated)" 
                 value={formData.imageUrl} 
                 onChange={handleChange} 
-                style={{ marginBottom: '10px', width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '14px' }}
+                rows="2"
+                style={{ marginBottom: '10px', width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '14px', resize: 'vertical' }}
               />
               <div style={{ textAlign: 'center', margin: '5px 0', color: '#666', fontSize: '12px', fontWeight: 'bold' }}>— OR UPLOAD LOCAL FILE —</div>
-              <input type="file" accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} />
+              <input type="file" multiple accept="image/jpeg, image/png, image/webp" onChange={handleFileChange} />
+              {imageFiles.length > 0 && (
+                <div style={{ marginTop: '8px', fontSize: '13px', color: '#555' }}>
+                  Selected {imageFiles.length} file(s)
+                </div>
+              )}
             </div>
           </div>
 

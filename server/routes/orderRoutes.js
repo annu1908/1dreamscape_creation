@@ -108,6 +108,7 @@ router.post('/', verifyToken,
           title: item.title,
           price: dbPrice, // Use DB price, not client price
           quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
+          personalization: item.personalization || '',
         };
       });
 

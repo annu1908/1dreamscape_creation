@@ -258,7 +258,14 @@ const AdminDashboard = () => {
                   <p><strong>Items:</strong></p>
                   <ul>
                     {order.items.map((item, i) => (
-                      <li key={i}>{item.title} <span className="qty">x {item.quantity}</span></li>
+                      <li key={i}>
+                        <div>{item.title} <span className="qty">x {item.quantity}</span></div>
+                        {item.personalization && (
+                          <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
+                            Custom: {item.personalization}
+                          </div>
+                        )}
+                      </li>
                     ))}
                   </ul>
                 </div>

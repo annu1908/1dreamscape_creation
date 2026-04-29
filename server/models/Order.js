@@ -8,9 +8,11 @@ const orderSchema = new mongoose.Schema({
 
   items: [
     {
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
       title: String,
       price: Number,
       quantity: Number,
+      personalization: String,
     }
   ],
 

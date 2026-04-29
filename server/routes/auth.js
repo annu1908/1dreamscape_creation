@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const crypto = require('crypto');
 const otpGenerator = require('otp-generator');
 const User = require('../models/User');
 const Otp = require('../models/Otp');
@@ -194,6 +195,112 @@ router.post('/login',
 
     } catch (err) {
       console.error('Login error:', err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// Forgot Password (Step 1)
+router.post('/forgot-password',
+  body('email').isEmail().withMessage('Please provide a valid email').normalizeEmail(),
+  async (req, res) => {
+    const validationError = handleValidation(req, res);
+    if (validationError) return;
+
+    const { email } = req.body;
+
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'No account found with this email' });
+      }
+
+      const otp = otpGenerator.generate(6, {
+        upperCaseAlphabets: false,
+        lowerCaseAlphabets: false,
+        specialChars: false,
+        digits: true,
+      });
+
+      await Otp.deleteMany({ email });
+      await Otp.create({ email, otp });
+
+      // Assuming sendEmail handles custom subjects or we can modify it. 
+      // The instructions say: Send email using existing sendOTPEmail utility with subject: "Reset Your Dreamscape Password"
+      // Wait, let's look at `sendEmail`. It doesn't currently take a subject argument.
+      // But the instructions specify: "Use this OTP to reset your password. Expires in 5 minutes."
+      // I will update sendEmail.js in another step to allow dynamic subjects and text, or just use sendEmail for now.
+      // Wait, let me check sendEmail.js first. 
+      await sendEmail(email, otp, 'Reset Your Dreamscape Password', 'Use this OTP to reset your password. Expires in 5 minutes.');
+
+      res.status(200).json({ message: 'Password reset OTP sent to your email' });
+    } catch (err) {
+      console.error('Forgot Password error:', err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// Verify Reset OTP (Step 2)
+router.post('/verify-reset-otp',
+  body('email').isEmail().withMessage('Please provide a valid email').normalizeEmail(),
+  body('otp').notEmpty().withMessage('OTP is required'),
+  async (req, res) => {
+    const validationError = handleValidation(req, res);
+    if (validationError) return;
+
+    const { email, otp } = req.body;
+
+    try {
+      const otpRecord = await Otp.findOne({ email, otp });
+      if (!otpRecord) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+      }
+
+      await Otp.deleteMany({ email });
+
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const resetTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 mins
+
+      await User.findOneAndUpdate({ email }, { resetToken, resetTokenExpiry });
+
+      res.status(200).json({ resetToken });
+    } catch (err) {
+      console.error('Verify Reset OTP error:', err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// Reset Password (Step 3)
+router.post('/reset-password',
+  body('resetToken').notEmpty().withMessage('Reset token is required'),
+  body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+  async (req, res) => {
+    const validationError = handleValidation(req, res);
+    if (validationError) return;
+
+    const { resetToken, newPassword } = req.body;
+
+    try {
+      const user = await User.findOne({
+        resetToken,
+        resetTokenExpiry: { $gt: Date.now() },
+      });
+
+      if (!user) {
+        return res.status(400).json({ message: 'Reset link expired or invalid' });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+      user.resetToken = null;
+      user.resetTokenExpiry = null;
+      await user.save();
+
+      res.status(200).json({ message: 'Password reset successfully' });
+    } catch (err) {
+      console.error('Reset Password error:', err);
       res.status(500).json({ message: 'Server error' });
     }
   }

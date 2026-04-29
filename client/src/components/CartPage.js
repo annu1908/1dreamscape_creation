@@ -19,18 +19,23 @@ const CartPage = () => {
       ) : (
         <>
           {cartItems.map((item) => (
-            <div key={item._id} className="cart-item">
+            <div key={item.cartItemId || item._id} className="cart-item">
               <img src={item.image ? getImageUrl(item.image) : 'placeholder.jpg'} alt={item.title} className="cart-img" />
               <div className="cart-details">
                 <h4>{item.title}</h4>
+                {item.personalization && (
+                  <p style={{ fontSize: '13px', color: '#6b7280', margin: '4px 0', lineHeight: '1.4' }}>
+                    <strong>Custom:</strong> {item.personalization}
+                  </p>
+                )}
                 <p>₹{item.price}</p>
                 <div className="quantity-controls">
-                  <button onClick={() => updateQuantity(item._id, item.quantity - 1)}>-</button>
+                  <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}>-</button>
                   <span>{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</button>
+                  <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}>+</button>
                 </div>
               </div>
-              <button className="remove-btn" onClick={() => removeFromCart(item._id)}>Remove</button>
+              <button className="remove-btn" onClick={() => removeFromCart(item.cartItemId)}>Remove</button>
             </div>
           ))}
 

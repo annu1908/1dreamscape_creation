@@ -99,10 +99,19 @@ const OrderHistory = () => {
 
               <div className="order-items">
                 {order.items.map((item, i) => (
-                  <div key={i} className="order-item">
-                    <span className="order-item-name">{item.title}</span>
-                    <span className="order-item-qty">× {item.quantity}</span>
-                    <span className="order-item-price">₹{item.price * item.quantity}</span>
+                  <div key={i} className="order-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <span className="order-item-name">{item.title}</span>
+                        <span className="order-item-qty" style={{ marginLeft: '6px' }}>× {item.quantity}</span>
+                      </div>
+                      <span className="order-item-price">₹{item.price * item.quantity}</span>
+                    </div>
+                    {item.personalization && (
+                      <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                        Custom: {item.personalization}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

@@ -449,6 +449,10 @@
     height: 54px;
   }
 
+  .chatbot-fab--open {
+    display: none;
+  }
+
   .chatbot-fab svg {
     width: 22px;
     height: 22px;

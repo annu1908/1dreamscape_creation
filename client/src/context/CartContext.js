@@ -6,7 +6,15 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
     // Load cart from localStorage on init
     const saved = localStorage.getItem('cartItems');
-    return saved ? JSON.parse(saved) : [];
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Ensure all items have a cartItemId for backward compatibility
+      return parsed.map(item => ({
+        ...item,
+        cartItemId: item.cartItemId || `${item._id}-${item.personalization || ''}`
+      }));
+    }
+    return [];
   });
 
   // Sync to localStorage whenever cart changes
@@ -15,29 +23,32 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (product) => {
-    const exists = cartItems.find((item) => item._id === product._id);
+    const cartItemId = `${product._id}-${product.personalization || ''}`;
+    const productWithCartId = { ...product, cartItemId };
+
+    const exists = cartItems.find((item) => item.cartItemId === cartItemId);
     if (exists) {
       setCartItems(
         cartItems.map((item) =>
-          item._id === product._id
-            ? { ...item, quantity: item.quantity + 1 }
+          item.cartItemId === cartItemId
+            ? { ...item, quantity: item.quantity + (product.quantity || 1) }
             : item
         )
       );
     } else {
-      setCartItems([...cartItems, { ...product, quantity: 1 }]);
+      setCartItems([...cartItems, { ...productWithCartId, quantity: product.quantity || 1 }]);
     }
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems(cartItems.filter((item) => item._id !== productId));
+  const removeFromCart = (cartItemId) => {
+    setCartItems(cartItems.filter((item) => item.cartItemId !== cartItemId));
   };
 
-  const updateQuantity = (productId, newQuantity) => {
+  const updateQuantity = (cartItemId, newQuantity) => {
     if (newQuantity < 1) return;
     setCartItems(
       cartItems.map((item) =>
-        item._id === productId ? { ...item, quantity: newQuantity } : item
+        item.cartItemId === cartItemId ? { ...item, quantity: newQuantity } : item
       )
     );
   };

@@ -49,6 +49,7 @@ const ProductDetails = () => {
   const [qty, setQty] = useState(1);
   const [copied, setCopied] = useState(false);
   const [addedAnim, setAddedAnim] = useState(false);
+  const [personalization, setPersonalization] = useState('');
 
   /* Related / Recent */
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -112,7 +113,7 @@ const ProductDetails = () => {
 
   /* Handlers */
   const handleAddToCart = () => {
-    addToCart({ ...product, quantity: qty });
+    addToCart({ ...product, quantity: qty, personalization });
     setAddedAnim(true);
     setTimeout(() => setAddedAnim(false), 1200);
     toast.success(`${product.title} added to cart!`, { autoClose: 1500, position: 'top-right' });
@@ -197,22 +198,6 @@ const ProductDetails = () => {
 
         {/* LEFT — Image Gallery */}
         <div className="pd-gallery">
-          {/* Thumbnail strip */}
-          {allImages.length > 1 && (
-            <div className="pd-gallery__thumbs">
-              {allImages.map((img, i) => (
-                <button
-                  key={i}
-                  className={`pd-gallery__thumb ${activeImage === img ? 'active' : ''}`}
-                  onClick={() => setActiveImage(img)}
-                  aria-label={`View image ${i + 1}`}
-                >
-                  <img src={img} alt={`${product.title} view ${i + 1}`} loading="lazy" />
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Main image */}
           <div className="pd-gallery__main" onClick={() => setZoomOpen(true)} role="button" tabIndex={0} aria-label="Click to zoom">
             <img
@@ -229,6 +214,22 @@ const ProductDetails = () => {
               Zoom
             </div>
           </div>
+
+          {/* Thumbnail strip */}
+          {allImages.length > 1 && (
+            <div className="pd-gallery__thumbs">
+              {allImages.map((img, i) => (
+                <button
+                  key={i}
+                  className={`pd-gallery__thumb ${activeImage === img ? 'active' : ''}`}
+                  onClick={() => setActiveImage(img)}
+                  aria-label={`View image ${i + 1}`}
+                >
+                  <img src={img} alt={`${product.title} view ${i + 1}`} loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* RIGHT — Product Info */}
@@ -283,6 +284,21 @@ const ProductDetails = () => {
           {/* Divider */}
           <div className="pd-divider" />
 
+          {/* Personalisation Box */}
+          <div className="pd-personalisation">
+            <label htmlFor="personalisation" className="pd-personalisation__label">
+              ✏️ Customisation Details
+            </label>
+            <textarea
+              id="personalisation"
+              className="pd-personalisation__input"
+              placeholder="Add any special instructions or customisation details for your order here..."
+              value={personalization}
+              onChange={(e) => setPersonalization(e.target.value)}
+              rows={3}
+            />
+          </div>
+
           {/* Quantity + CTA */}
           <div className="pd-cta-row">
             <div className="pd-qty">
@@ -325,7 +341,7 @@ const ProductDetails = () => {
           <div className="pd-trust-strip">
             <TrustBadge icon="🚚" text="Free shipping on ₹999+" />
             <TrustBadge icon="🔒" text="Secure payment" />
-            <TrustBadge icon="↩️" text="Easy returns" />
+            <TrustBadge icon="✨" text="Unique & Personalized" />
           </div>
 
           {/* Info Accordion */}
