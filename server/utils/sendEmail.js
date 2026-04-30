@@ -1,22 +1,24 @@
-const nodemailer = require('nodemailer');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 require('dotenv').config();
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp-relay.brevo.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.BREVO_LOGIN,
-    pass: process.env.BREVO_API_KEY,
-  },
-});
+// Configure API key authorization
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 const sendEmail = async (to, otp, subject = 'Your Verification Code - Dreamscape Creation', bodyText = 'Thank you for signing up with Dreamscape Creation. Use the verification code below to complete your registration.') => {
-  const mailOptions = {
-    from: `"Dreamscape Creation" <${process.env.BREVO_EMAIL}>`,
-    to,
-    subject,
-    html: `
+  try {
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.sender = { 
+      name: "Dreamscape Creation", 
+      email: process.env.EMAIL_USER 
+    };
+    sendSmtpEmail.to = [{ email: to }];
+    sendSmtpEmail.htmlContent = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -87,10 +89,15 @@ const sendEmail = async (to, otp, subject = 'Your Verification Code - Dreamscape
         </table>
       </body>
       </html>
-    `,
-  };
+    `;
 
-  await transporter.sendMail(mailOptions);
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('Email sent successfully. ID: ' + data.messageId);
+    return data;
+  } catch (error) {
+    console.error('Error sending email via Brevo:', error);
+    throw new Error('Could not send email.');
+  }
 };
 
 module.exports = sendEmail;
