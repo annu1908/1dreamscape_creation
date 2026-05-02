@@ -23,10 +23,18 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(compression());
 
 app.use(cors({
-  origin: [
-    "https://1dreamscape-creation.vercel.app",
-    "http://localhost:3000"
-  ],
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://1dreamscape-creation.vercel.app",
+      "http://localhost:3000"
+    ];
+    // Allow requests with no origin (like mobile apps) or from allowed origins/vercel subdomains
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
