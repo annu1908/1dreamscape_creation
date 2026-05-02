@@ -3,10 +3,10 @@ import API from '../api';
 import './ChatBot.css';
 
 const SUGGESTIONS = [
-  "What do you sell?",
-  "Shipping info",
-  "Custom orders",
-  "How to contact you?",
+  "Suggest a gift",
+  "Do you make custom orders?",
+  "Show resin products",
+  "Shipping and payment",
 ];
 
 const formatTime = () => {

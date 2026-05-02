@@ -119,10 +119,12 @@ router.put('/:id', verifyToken, adminOnly, optionalUpload, async (req, res) => {
   try {
     const { title, description, price, category } = req.body;
     let updateData = { title, description, price: Number(price), category };
+    const hasImageUrlInput = Object.prototype.hasOwnProperty.call(req.body, 'imageUrl');
+    const hasImagesInput = Object.prototype.hasOwnProperty.call(req.body, 'images');
 
-    // Update the image path if an image URL is provided in the body
-    if (req.body.imageUrl) {
-      updateData.image = req.body.imageUrl;
+    // Replace the primary image when edit form sends imageUrl, even if it is empty.
+    if (hasImageUrlInput) {
+      updateData.image = req.body.imageUrl || '';
     }
 
     // If a new primary image file was uploaded, override with local file path
@@ -131,14 +133,15 @@ router.put('/:id', verifyToken, adminOnly, optionalUpload, async (req, res) => {
     }
 
     // Process additional images if updating
-    let imagesArray = req.body.images ? (Array.isArray(req.body.images) ? req.body.images : [req.body.images]) : [];
+    let imagesArray = hasImagesInput ? (Array.isArray(req.body.images) ? req.body.images : [req.body.images]) : [];
+    imagesArray = imagesArray.filter(Boolean);
     if (req.files && req.files.images) {
       req.files.images.forEach(file => {
         imagesArray.push(`/uploads/${file.filename}`);
       });
     }
-    // Update images array if URLs or files were provided
-    if (req.body.images || (req.files && req.files.images)) {
+    // Replace images array when the edit form sends an image list, so removed images stay removed.
+    if (hasImageUrlInput || hasImagesInput || (req.files && (req.files.image || req.files.images))) {
        updateData.images = imagesArray;
     }
 
@@ -175,4 +178,4 @@ router.delete('/:id', verifyToken, adminOnly, async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;

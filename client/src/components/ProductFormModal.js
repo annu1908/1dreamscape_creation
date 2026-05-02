@@ -3,6 +3,21 @@ import './ProductFormModal.css';
 import { getImageUrl } from '../utils/imageUtils';
 import API from '../api';
 
+const parseImageUrls = (value = '') =>
+  value
+    .split(/[\n,]+/)
+    .map((url) => url.trim())
+    .filter(Boolean);
+
+const getProductImageUrls = (product) => {
+  const urls = [
+    product?.image,
+    ...(Array.isArray(product?.images) ? product.images : []),
+  ].filter(Boolean);
+
+  return [...new Set(urls)];
+};
+
 const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [formData, setFormData] = useState({
     title: '',
@@ -23,7 +38,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         description: initialData.description || '',
         price: initialData.price || '',
         category: initialData.category || '',
-        imageUrl: initialData.image || '',
+        imageUrl: getProductImageUrls(initialData).join('\n'),
       });
       setImageFiles([]); // Reset file input when editing
     } else {
@@ -42,6 +57,15 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
 
   const handleFileChange = (e) => {
     setImageFiles(Array.from(e.target.files));
+  };
+
+  const handleRemoveImageUrl = (imageUrlToRemove) => {
+    setFormData((prev) => ({
+      ...prev,
+      imageUrl: parseImageUrls(prev.imageUrl)
+        .filter((imageUrl) => imageUrl !== imageUrlToRemove)
+        .join('\n'),
+    }));
   };
 
   // Shared helper — calls the backend and auto-fills form fields
@@ -68,13 +92,24 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       });
     } catch (err) {
       console.error('AI analysis failed:', err);
+      const message = err.response?.data?.message || 'AI analysis failed. Please fill manually.';
       setAiMessage({
         type: 'error',
-        text: '⚠️ AI analysis failed. Please fill manually.',
+        text: message,
       });
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const analyseImageFile = async (file) => {
+    const data = new FormData();
+    data.append('image', file);
+
+    await runAiAnalysis([
+      data,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    ]);
   };
 
   const handleAiAnalyse = () => {
@@ -87,7 +122,13 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       return;
     }
 
-    // CASE 2 — No URL: open file picker
+    // CASE 2 — Product upload already has a local file selected
+    if (imageFiles.length > 0) {
+      analyseImageFile(imageFiles[0]);
+      return;
+    }
+
+    // CASE 3 — Both URL and local upload are empty: open file picker
     aiFileInputRef.current.click();
   };
 
@@ -95,13 +136,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const data = new FormData();
-    data.append('image', file);
-
-    await runAiAnalysis([
-      data,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
-    ]);
+    await analyseImageFile(file);
 
     // Reset the file input so the same file can be re-selected
     e.target.value = '';
@@ -114,24 +149,25 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     data.append('description', formData.description);
     data.append('price', formData.price);
     data.append('category', formData.category);
-    
+
+    const imageUrls = parseImageUrls(formData.imageUrl);
+
     if (imageFiles.length > 0) {
       data.append('image', imageFiles[0]); // First one is primary
       for (let i = 1; i < imageFiles.length; i++) {
         data.append('images', imageFiles[i]);
       }
-    } else if (formData.imageUrl) {
-      const urls = formData.imageUrl.split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
-      if (urls.length > 0) {
-        data.append('imageUrl', urls[0]);
-        for (let i = 1; i < urls.length; i++) {
-          data.append('images', urls[i]);
-        }
+    } else if (initialData || imageUrls.length > 0) {
+      data.append('imageUrl', imageUrls[0] || '');
+      for (let i = 1; i < imageUrls.length; i++) {
+        data.append('images', imageUrls[i]);
       }
     }
 
     onSubmit(data);
   };
+
+  const currentImageUrls = parseImageUrls(formData.imageUrl);
 
   return (
     <div className="modal-overlay">
@@ -159,7 +195,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               <input
                 type="file"
                 ref={aiFileInputRef}
-                accept="image/jpeg, image/jpg, image/png, image/webp"
+                accept="image/jpeg, image/jpg, image/png"
                 onChange={handleAiFileSelected}
                 style={{ display: 'none' }}
               />
@@ -175,7 +211,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
             <label>Title</label>
             <input type="text" name="title" value={formData.title} onChange={handleChange} required />
           </div>
-          
+
           <div className="form-group">
             <label>Category</label>
             <input type="text" name="category" value={formData.category} onChange={handleChange} required />
@@ -193,19 +229,35 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
 
           <div className="form-group">
             <label>Product Image</label>
-            {initialData && initialData.image && imageFiles.length === 0 && (
+            {currentImageUrls.length > 0 && imageFiles.length === 0 && (
               <div className="current-image-preview">
-                <p>Current Image:</p>
-                <img src={getImageUrl(initialData.image)} alt="Current product" width="100" />
+                <p>Current Images:</p>
+                {currentImageUrls.map((imageUrl, index) => (
+                  <div className="current-image-preview__item" key={imageUrl}>
+                    <img
+                      src={getImageUrl(imageUrl)}
+                      alt={`Current product ${index + 1}`}
+                      width="100"
+                    />
+                    <button
+                      type="button"
+                      className="current-image-preview__remove"
+                      onClick={() => handleRemoveImageUrl(imageUrl)}
+                      aria-label={`Remove image ${index + 1}`}
+                      title="Remove image"
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
-            
             <div className="image-input-container">
-              <textarea 
-                name="imageUrl" 
-                placeholder="Paste Image URL(s) here (one per line or comma separated)" 
-                value={formData.imageUrl} 
-                onChange={handleChange} 
+              <textarea
+                name="imageUrl"
+                placeholder="Paste Image URL(s) here (one per line or comma separated)"
+                value={formData.imageUrl}
+                onChange={handleChange}
                 rows="2"
                 style={{ marginBottom: '10px', width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '14px', resize: 'vertical' }}
               />
