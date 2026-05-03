@@ -17,7 +17,10 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 
 // Security headers
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(helmet({ 
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false // Disable CSP temporarily to ensure Razorpay and Vercel bots aren't blocked
+}));
 
 // Gzip compression
 app.use(compression());
@@ -26,13 +29,15 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       "https://1dreamscape-creation.vercel.app",
+      "https://dreamscape-creation.vercel.app",
       "http://localhost:3000"
     ];
-    // Allow requests with no origin (like mobile apps) or from allowed origins/vercel subdomains
+    // Allow requests with no origin (like Vercel bots or mobile apps) or from allowed origins/vercel subdomains
     if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      // Instead of returning an error (403), we just fail the CORS check for other domains
+      callback(null, false);
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE"],
