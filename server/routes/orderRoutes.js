@@ -5,6 +5,7 @@ const { body, param, validationResult } = require('express-validator');
 const Razorpay = require('razorpay');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const User = require('../models/User');
 const verifyToken = require('../middleware/authMiddleware');
 const adminOnly = require('../middleware/adminMiddleware');
 require('dotenv').config();
@@ -72,11 +73,21 @@ router.post('/', verifyToken,
         customerName,
         customerEmail,
         deliveryAddress,
+        structuredAddress,
+        phone,
         items,
         paymentId,
         razorpayOrderId,
         razorpaySignature,
       } = req.body;
+
+      // ✅ Update user profile with latest address and phone for auto-fill next time
+      if (req.user && req.user.userId && structuredAddress) {
+        await User.findByIdAndUpdate(req.user.userId, {
+          phone: phone || '',
+          address: structuredAddress,
+        });
+      }
 
       // ✅ Verify Razorpay payment signature
       const generatedSignature = crypto

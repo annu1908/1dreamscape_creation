@@ -5,17 +5,27 @@
 
 .wishlist-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+@media (min-width: 500px) {
+  .wishlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
 }
 
 .wishlist-item {
+  display: flex;
+  flex-direction: column;
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 10px;
   text-align: center;
   background: #fff;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  height: 100%;
 }
 
 .wishlist-item:hover {
@@ -47,7 +57,7 @@
 }
 
 .wishlist-item button {
-  margin-top: 10px;
+  margin-top: auto;
   padding: 8px 16px;
   background-color: #d86b94;
   color: white;

@@ -14,7 +14,10 @@ const COUPONS = {
 
 const CheckoutPage = () => {
   const { cartItems, clearCart } = useCart();
-  const [formData, setFormData] = useState({ name: '', email: '', address: '', phone: '' });
+  const [formData, setFormData] = useState({ 
+    name: '', email: '', phone: '', 
+    street: '', city: '', state: '', pinCode: '' 
+  });
   const [user, setUser] = useState(null);
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -44,6 +47,11 @@ const CheckoutPage = () => {
         ...prev,
         name: parsedUser.name || '',
         email: parsedUser.email || '',
+        phone: parsedUser.phone || '',
+        street: parsedUser.address?.street || '',
+        city: parsedUser.address?.city || '',
+        state: parsedUser.address?.state || '',
+        pinCode: parsedUser.address?.pinCode || '',
       }));
     }
   }, []);
@@ -77,8 +85,8 @@ const CheckoutPage = () => {
       navigate('/login');
       return;
     }
-    if (!formData.address.trim()) {
-      alert('⚠️ Please enter your delivery address.');
+    if (!formData.street.trim() || !formData.city.trim() || !formData.state.trim() || !formData.pinCode.trim()) {
+      alert('⚠️ Please fill out all delivery address fields.');
       return;
     }
 
@@ -93,10 +101,19 @@ const CheckoutPage = () => {
         description: `Order Payment${appliedCoupon ? ` (${appliedCoupon.code} applied)` : ''}`,
         order_id: orderData.id,
         handler: async function (response) {
+          const formattedAddress = `${formData.street}, ${formData.city}, ${formData.state} - ${formData.pinCode}`;
+          
           const orderDetails = {
             customerName: formData.name,
             customerEmail: formData.email,
-            deliveryAddress: formData.address,
+            deliveryAddress: formattedAddress,
+            structuredAddress: {
+              street: formData.street,
+              city: formData.city,
+              state: formData.state,
+              pinCode: formData.pinCode
+            },
+            phone: formData.phone,
             items: cartItems,
             subtotal,
             deliveryCharge,
@@ -221,8 +238,22 @@ const CheckoutPage = () => {
               <input type="tel" name="phone" placeholder="+91 XXXXX XXXXX" value={formData.phone} onChange={handleInputChange} />
             </div>
             <div className="form-group">
-              <label>Delivery Address</label>
-              <textarea name="address" placeholder="House no., Street, City, State, PIN" value={formData.address} onChange={handleInputChange} required rows={4}></textarea>
+              <label>Street Address</label>
+              <textarea name="street" placeholder="House no., Building, Street area" value={formData.street} onChange={handleInputChange} required rows={2}></textarea>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>City</label>
+                <input type="text" name="city" placeholder="City" value={formData.city} onChange={handleInputChange} required />
+              </div>
+              <div className="form-group">
+                <label>State</label>
+                <input type="text" name="state" placeholder="State" value={formData.state} onChange={handleInputChange} required />
+              </div>
+            </div>
+            <div className="form-group">
+              <label>PIN Code</label>
+              <input type="text" name="pinCode" placeholder="6-digit PIN code" value={formData.pinCode} onChange={handleInputChange} required maxLength="6" pattern="\d{6}" title="Please enter a valid 6-digit PIN code" />
             </div>
 
             <button type="button" className="pay-btn" onClick={handlePayment}>

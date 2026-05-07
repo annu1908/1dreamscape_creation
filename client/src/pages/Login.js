@@ -40,8 +40,8 @@ const Login = () => {
 
     try {
       const response = await API.post('/api/auth/login', formData);
-      const { token, name, email, role } = response.data;
-      login(token, { name, email, role });
+      const { token, name, email, role, phone, address } = response.data;
+      login(token, { name, email, role, phone, address });
       setMessage('Login successful! Redirecting...');
       setTimeout(() => navigate('/'), 1500);
     } catch (err) {

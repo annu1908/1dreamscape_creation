@@ -191,7 +191,14 @@ router.post('/login',
         expiresIn: '1d',
       });
 
-      res.status(200).json({ token, name: user.name, email: user.email, role: user.role });
+      res.status(200).json({ 
+        token, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role,
+        phone: user.phone || '',
+        address: user.address || { street: '', city: '', state: '', pinCode: '' }
+      });
 
     } catch (err) {
       console.error('Login error:', err);

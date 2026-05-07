@@ -23,6 +23,18 @@ const userSchema = new mongoose.Schema({
     default: 'user',
   },
 
+  phone: {
+    type: String,
+    default: '',
+  },
+
+  address: {
+    street: { type: String, default: '' },
+    city: { type: String, default: '' },
+    state: { type: String, default: '' },
+    pinCode: { type: String, default: '' }
+  },
+
   isVerified: {
     type: Boolean,
     default: false,
