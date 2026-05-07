@@ -177,15 +177,43 @@
 }
 
 .profile-quick-icon {
-  font-size: 26px;
   width: 44px;
   height: 44px;
-  background: #f8fafc;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.profile-quick-card:hover .profile-quick-icon {
+  transform: scale(1.1);
+}
+
+.profile-quick-icon--orders {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #b45309;
+}
+
+.profile-quick-icon--wishlist {
+  background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+  color: #db2777;
+}
+
+.profile-quick-icon--cart {
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #7c3aed;
+}
+
+.profile-quick-icon--shop {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #059669;
+}
+
+.profile-quick-icon--admin {
+  background: linear-gradient(135deg, #fce7f3, #fecdd3);
+  color: #e11d48;
 }
 
 .profile-quick-card h4 {
@@ -449,4 +477,8 @@ body.dark .profile-account-row { border-color: #2d2d44; }
 body.dark .profile-tabs { border-color: #2d2d44; }
 body.dark .profile-tab-btn { color: #64748b; }
 body.dark .profile-order-item-chip { background: #252540; color: #94a3b8; }
-body.dark .profile-quick-icon { background: #252540; }
+body.dark .profile-quick-icon--orders { background: linear-gradient(135deg, #422006, #78350f); color: #fbbf24; }
+body.dark .profile-quick-icon--wishlist { background: linear-gradient(135deg, #4a0d2e, #831843); color: #f9a8d4; }
+body.dark .profile-quick-icon--cart { background: linear-gradient(135deg, #2e1065, #3b0764); color: #c4b5fd; }
+body.dark .profile-quick-icon--shop { background: linear-gradient(135deg, #064e3b, #065f46); color: #6ee7b7; }
+body.dark .profile-quick-icon--admin { background: linear-gradient(135deg, #4a0d2e, #9f1239); color: #fda4af; }

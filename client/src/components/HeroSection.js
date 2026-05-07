@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import './HeroSection.css';
 
 const HeroSection = () => {
@@ -11,21 +11,7 @@ const HeroSection = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const navigate = useNavigate();
 
-  const categories = [
-    { icon: '🧵', label: 'Embroidery', value: 'embroidery' },
-    { icon: '💎', label: 'Resin Art', value: 'resin' },
-    { icon: '✏️', label: 'Sketches', value: 'sketch' },
-    { icon: '🧶', label: 'Crochet', value: 'crochet' },
-  ];
-
-  const handleCategoryClick = (value) => {
-    navigate(`/?category=${value}`);
-    setTimeout(() => {
-      document.getElementById('product-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
 
   return (
     <section className={`hero ${isVisible ? 'hero--visible' : ''}`} id="hero">
@@ -39,7 +25,7 @@ const HeroSection = () => {
       <div className="hero__container">
         {/* Left content */}
         <div className="hero__content">
-          <span className="hero__badge">✨ Handcrafted with Love</span>
+          <span className="hero__badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{marginRight:'4px',verticalAlign:'middle'}}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Handcrafted with Love</span>
 
           <h1 className="hero__title">
             <span className="hero__title-line">Welcome to</span>
@@ -86,20 +72,7 @@ const HeroSection = () => {
             </button>
           </div>
 
-          {/* Category badges */}
-          <div className="hero__categories">
-            {categories.map((cat, i) => (
-              <div
-                key={cat.label}
-                className="hero__category"
-                style={{ animationDelay: `${0.8 + i * 0.1}s`, cursor: 'pointer' }}
-                onClick={() => handleCategoryClick(cat.value)}
-              >
-                <span className="hero__category-icon">{cat.icon}</span>
-                <span className="hero__category-label">{cat.label}</span>
-              </div>
-            ))}
-          </div>
+
         </div>
 
         {/* Right image */}
@@ -115,14 +88,14 @@ const HeroSection = () => {
 
           {/* Floating stat cards */}
           <div className="hero__float-card hero__float-card--top">
-            <span className="hero__float-card-icon">🎨</span>
+            <span className="hero__float-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></span>
             <div>
               <strong>100+</strong>
               <span>Unique Designs</span>
             </div>
           </div>
           <div className="hero__float-card hero__float-card--bottom">
-            <span className="hero__float-card-icon">💝</span>
+            <span className="hero__float-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
             <div>
               <strong>Handmade</strong>
               <span>With Care</span>

@@ -126,11 +126,11 @@
 /* Cart badge */
 .cart-badge {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  min-width: 17px;
-  height: 17px;
-  padding: 0 4px;
+  top: -6px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
   background: linear-gradient(135deg, #d86b94, #b85078);
   color: #fff;
   font-size: 10px;
@@ -139,10 +139,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(14, 14, 24, 0.9);
+  border: 2px solid rgba(14, 14, 24, 0.95);
   line-height: 1;
   animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 2px 6px rgba(216, 107, 148, 0.5);
+  box-shadow: 0 2px 8px rgba(216, 107, 148, 0.5);
+  pointer-events: none;
 }
 
 @keyframes badgePop {

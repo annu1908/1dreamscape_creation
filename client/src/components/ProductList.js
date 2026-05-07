@@ -79,10 +79,10 @@ const ProductList = () => {
 
   const categories = [
     { key: 'all', label: 'All' },
-    { key: 'resin', label: '🪩 Resin' },
-    { key: 'embroidery', label: '🧵 Embroidery' },
-    { key: 'sketch', label: '✏️ Sketch' },
-    { key: 'crochet', label: '🧶 Crochet' },
+    { key: 'resin', label: 'Resin' },
+    { key: 'embroidery', label: 'Embroidery' },
+    { key: 'sketch', label: 'Sketch' },
+    { key: 'crochet', label: 'Crochet' },
   ];
 
   // Pagination helpers
@@ -109,7 +109,7 @@ const ProductList = () => {
       </div>
 
       <div className="search-bar">
-        <span className="search-icon">🔍</span>
+        <span className="search-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
         <input
           type="text"
           placeholder="Search products by name, description, or category..."
@@ -117,7 +117,7 @@ const ProductList = () => {
           onChange={handleSearch}
         />
         {searchQuery && (
-          <button className="search-clear" onClick={() => setSearchQuery('')}>✕</button>
+          <button className="search-clear" onClick={() => setSearchQuery('')}>×</button>
         )}
       </div>
 
@@ -194,7 +194,7 @@ const ProductList = () => {
         </>
       ) : (
         <div className="no-results">
-          <span className="no-results-icon">🔍</span>
+          <span className="no-results-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           <p>No products found {searchQuery ? `for "${searchQuery}"` : `in "${categoryParam}"`}</p>
           <button onClick={() => { navigate('/'); setSearchQuery(''); }}>
             View All Products

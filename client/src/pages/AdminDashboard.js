@@ -141,7 +141,8 @@ const AdminDashboard = () => {
           className={activeTab === 'analytics' ? 'active' : ''}
           onClick={() => setActiveTab('analytics')}
         >
-          📊 Analytics
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '6px'}}><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          Analytics
         </button>
         <button 
           className={activeTab === 'orders' ? 'active' : ''} 
@@ -162,22 +163,22 @@ const AdminDashboard = () => {
           <h3>Store Analytics</h3>
           <div className="analytics-stats">
             <div className="stat-card">
-              <div className="stat-icon">💰</div>
+              <div className="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
               <div className="stat-value">₹{totalRevenue.toLocaleString('en-IN')}</div>
               <div className="stat-label">Total Revenue</div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">📦</div>
+              <div className="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
               <div className="stat-value">{orders.length}</div>
               <div className="stat-label">Total Orders</div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">🛍️</div>
+              <div className="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
               <div className="stat-value">{products.length}</div>
               <div className="stat-label">Products Listed</div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">📈</div>
+              <div className="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
               <div className="stat-value">₹{avgOrderValue.toLocaleString('en-IN')}</div>
               <div className="stat-label">Avg Order Value</div>
             </div>

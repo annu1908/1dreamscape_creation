@@ -5,6 +5,7 @@ const OpenAI = require('openai');
 const verifyToken = require('../middleware/authMiddleware');
 const adminOnly = require('../middleware/adminMiddleware');
 const upload = require('../middleware/uploadMiddleware');
+const cloudinary = require('../config/cloudinary');
 
 const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1';
 const VISION_MODEL = process.env.NVIDIA_VISION_MODEL || 'meta/llama-3.2-11b-vision-instruct';
@@ -21,12 +22,22 @@ Choose the category from visual evidence:
 - Sketch: pencil, charcoal, ink, or hand-drawn portrait/illustration
 
 The category value must be exactly one of: Embroidery, Crochet, Resin, Sketch.
+
+For price, estimate a realistic price in Indian Rupees (INR) based on the product type, size, and complexity:
+- Small crochet items (keychains, flowers): 150–400
+- Medium crochet (plushies, bags): 400–1200
+- Embroidery hoops/art: 700–1500
+- Resin keychains/small items: 200–600
+- Resin trays/large art: 600–2500
+- Sketches/portraits: 500–3000
+Never return 0 for the price. Always estimate a reasonable value.
+
 Do not default to the first category. Do not use markdown. Do not add comments.
 Use exactly this shape, replacing the placeholder values:
 {
   "title": "...",
   "category": "...",
-  "price": 0,
+  "price": 499,
   "description": "..."
 }`;
 
@@ -190,6 +201,38 @@ const optionalUpload = (req, res, next) => {
     next();
   });
 };
+
+// POST /api/admin/upload-image
+// Accepts a single image file, uploads it to Cloudinary, returns the public URL.
+router.post(
+  '/upload-image',
+  verifyToken,
+  adminOnly,
+  upload.single('image'),
+  async (req, res) => {
+    let filePath = null;
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No image file provided.' });
+      }
+      filePath = req.file.path;
+
+      const result = await cloudinary.uploader.upload(filePath, {
+        folder: 'dreamscape-products',
+        resource_type: 'image',
+      });
+
+      res.json({ url: result.secure_url });
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      res.status(500).json({ message: 'Image upload failed. Please try again.' });
+    } finally {
+      if (filePath) {
+        try { fs.unlinkSync(filePath); } catch (_) { }
+      }
+    }
+  }
+);
 
 // POST /api/admin/analyze-product
 // Accepts EITHER:
