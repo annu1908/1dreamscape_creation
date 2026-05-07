@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ProductFormModal.css';
 import { getImageUrl } from '../utils/imageUtils';
 import API from '../api';

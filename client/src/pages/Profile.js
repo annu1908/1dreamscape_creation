@@ -34,8 +34,7 @@ const Profile = () => {
     ? user.name.split(' ').map(n => n.charAt(0).toUpperCase()).join('').slice(0, 2)
     : '?';
 
-  const totalSpent = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const delivered = orders.filter(o => o.status === 'delivered').length;
+
 
   const getStatusColor = (status) => {
     switch (status) {
