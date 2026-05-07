@@ -26,6 +26,11 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [uploadError, setUploadError] = useState('');
   const [dragActive, setDragActive] = useState(false);
 
+  // Additional gallery images (Phase 2)
+  const [additionalImages, setAdditionalImages] = useState([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const galleryInputRef = useRef(null);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -52,6 +57,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         category: initialData.category || '',
         imageUrl: getProductImageUrls(initialData).join('\n'),
       });
+      setAdditionalImages([]);
     } else {
       // Add mode — start at Phase 1
       setPhase('upload');
@@ -59,6 +65,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       setUploadStatus('idle');
       setUploadError('');
       setFormData({ title: '', description: '', price: '', category: '', imageUrl: '' });
+      setAdditionalImages([]);
     }
     setAiMessage(null);
     setAiLoading(false);
@@ -151,6 +158,33 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     }));
   };
 
+  // ─── Gallery: upload additional images ───
+
+  const handleGalleryUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    e.target.value = '';
+
+    setGalleryUploading(true);
+    for (const file of files) {
+      try {
+        const data = new FormData();
+        data.append('image', file);
+        const res = await API.post('/api/admin/upload-image', data, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        setAdditionalImages((prev) => [...prev, res.data.url]);
+      } catch (err) {
+        console.error('Gallery upload failed for', file.name, err);
+      }
+    }
+    setGalleryUploading(false);
+  };
+
+  const handleRemoveGalleryImage = (index) => {
+    setAdditionalImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleAiAnalyse = async () => {
     // Determine which URL to send
     const urlToAnalyze = cloudinaryUrl || formData.imageUrl?.trim();
@@ -219,8 +253,13 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       data.append('price', formData.price);
       data.append('category', formData.category);
       data.append('imageUrl', cloudinaryUrl || imageUrls[0] || '');
-      for (let i = 1; i < imageUrls.length; i++) {
-        data.append('images', imageUrls[i]);
+      // Combine any parsed extra URLs + gallery-uploaded URLs
+      const allExtra = [
+        ...imageUrls.slice(1),
+        ...additionalImages,
+      ];
+      for (const url of allExtra) {
+        data.append('images', url);
       }
       onSubmit(data);
     }
@@ -284,7 +323,7 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               </div>
             )}
 
-            <div className="upload-phase__actions">
+            <div className="modal-actions" style={{ justifyContent: 'center', marginTop: '16px' }}>
               <button type="button" className="btn-cancel" onClick={onClose}>
                 Cancel
               </button>
@@ -357,6 +396,53 @@ const ProductFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               <label>Description</label>
               <textarea name="description" value={formData.description} onChange={handleChange} rows="3" required></textarea>
             </div>
+
+            {/* ─── Additional Gallery Images (new products) ─── */}
+            {!initialData && (
+              <div className="form-group">
+                <label>Additional Images <span className="label-hint">(optional — for product gallery)</span></label>
+                <div className="gallery-upload-section">
+                  {/* Thumbnails */}
+                  {additionalImages.length > 0 && (
+                    <div className="gallery-thumbs">
+                      {additionalImages.map((url, i) => (
+                        <div className="gallery-thumb" key={url + i}>
+                          <img src={url} alt={`Gallery ${i + 1}`} />
+                          <button
+                            type="button"
+                            className="gallery-thumb__remove"
+                            onClick={() => handleRemoveGalleryImage(i)}
+                            aria-label={`Remove image ${i + 1}`}
+                          >×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Upload button */}
+                  <button
+                    type="button"
+                    className="gallery-add-btn"
+                    onClick={() => galleryInputRef.current?.click()}
+                    disabled={galleryUploading}
+                  >
+                    {galleryUploading ? (
+                      <><span className="gallery-add-btn__spinner"></span> Uploading...</>
+                    ) : (
+                      <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add More Images</>
+                    )}
+                  </button>
+                  <input
+                    type="file"
+                    ref={galleryInputRef}
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    multiple
+                    onChange={handleGalleryUpload}
+                    style={{ display: 'none' }}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Image management for EDIT mode */}
             {initialData && (

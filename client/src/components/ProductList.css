@@ -115,7 +115,8 @@
   color: #d86b94;
 }
 
-.filter-buttons .active {
+.filter-buttons button.active,
+.filter-buttons button.active:hover {
   background: linear-gradient(135deg, #d86b94 0%, #b85078 100%);
   color: white;
   border-color: transparent;
@@ -219,7 +220,8 @@ body.dark .filter-buttons button:hover {
   color: #d86b94;
 }
 
-body.dark .filter-buttons .active {
+body.dark .filter-buttons button.active,
+body.dark .filter-buttons button.active:hover {
   background: linear-gradient(135deg, #d86b94 0%, #b85078 100%);
   color: white;
   border-color: transparent;
